@@ -1,0 +1,50 @@
+- name: place nomad config
+  template: src=nomad_agent_conf.j2 dest={{ config_dir }}/agent.hcl
+  tags: configure
+
+- name: setup nomad daemon for Ubuntu 14 nodes
+  template: src=nomad_service_14.j2 dest=/etc/init/nomad-agent.conf
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '14.04'
+  tags: daemon
+  
+- name: setup nomad daemon for Ubuntu 16 nodes
+  template: src=nomad_service_16.j2 dest=/etc/systemd/system/nomad-agent.service
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '16.04'
+  tags: daemon
+  
+- name: reload systemd on Ubuntu 16 nodes
+  shell: systemctl daemon-reload
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '16.04'
+  tags: daemon
+  
+- name: add nomad to startup
+  service: name=nomad-agent enabled=yes
+  tags: startup
+  
+- name: start nomad agent
+  service: name=nomad-agent state=started
+  tags: service
+  
+- name: update jobs
+  copy: src={{ nomad_local_configs }}/{{ item }}.json dest={{ config_dir }}/
+  with_items: "{{ nomad_jobs }}"
+  when: nomad_jobs is defined
+  notify: restart nomad-agent
+  tags: discovery
+
+- name: remove nomad from startup
+  service: name=nomad-agent enabled=no
+  tags: cleanup
+  
+- name: stop nomad agent
+  service: name=nomad-agent state=stopped
+  tags: cleanup
+
+- name: check nomad service state
+  shell: service nomad-agent status
+  register: nomad_state
+  tags: check
+  
+- name: print nomad service state
+  debug: msg={{ nomad_state.stdout }}
+  tags: check  

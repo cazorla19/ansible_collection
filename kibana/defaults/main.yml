@@ -1,0 +1,7 @@
+---
+
+kibana_version: 4.4
+nginx_auth_user: "{{ lookup('ini', 'auth_user section=nginx file=../../../credentials.ini') }}"
+nginx_auth_password: "{{ lookup('ini', 'auth_password section=nginx file=../../../credentials.ini') }}"
+nginx_vhost_file: /etc/nginx/sites-available/default
+server_name: example.com

@@ -1,0 +1,9 @@
+- name: check apache service
+  service: name={{ apache_daemon }} state=started
+  tags: install
+
+- name: place apache config
+  template: src=httpd.j2 dest=/etc/httpd/conf/httpd.conf
+  notify: reload apache
+  tags: configure
+

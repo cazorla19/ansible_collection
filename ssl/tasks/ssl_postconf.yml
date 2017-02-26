@@ -1,0 +1,18 @@
+ - name: copy received certificates
+   copy: src={{ local_directory }}/{{ domain_cert_name }}.{{ item }} dest={{ cert_directory }}/{{ domain_cert_name }}.{{ item }}
+   with_items:
+      - crt
+      - ca-bundle
+   tags: post_conf
+
+ - name: renovate apache configuration files and .htaccess [part1]
+   lineinfile: dest={{ apache_config }} insertafter="^<Directory "{{ site_directory }}">" line="SSLVerifyClient optional"
+   tags: post_conf
+
+ - name: renovate apache configuration files and .htaccess [part2]
+   template: src={{ item.src }}.j2 dest={{ item.dest }} force=yes
+   with_items:
+      - { src: ssl.conf, dest: "{{ ssl_config }}" }
+      - { src: htaccess, dest: "{{ site_directory }}/.htaccess" }
+   notify: restart apache
+   tags: post_conf

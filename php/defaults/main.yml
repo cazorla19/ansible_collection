@@ -1,0 +1,5 @@
+---
+
+site_directory: /var/www
+remote_user: www-data
+remote_group: www-data

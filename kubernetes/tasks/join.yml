@@ -1,0 +1,24 @@
+- name: check kubeadm configuration
+  stat:
+    path: /etc/kubernetes/kubelet.conf
+  register: kubeadmin_config
+  tags:
+    - cluster
+    - join
+
+- name: join kubernetes cluster
+  command: "kubeadm join {{configuration.get(computing_environment).kube_master}} --token {{configuration.get(computing_environment).auth_token}} --skip-preflight-checks"
+  when: kubeadmin_config.stat.exists == False
+  tags:
+    - cluster
+    - join
+
+- name: ensure kubelet is running
+  service:
+    name: kubelet
+    enabled: yes
+    state: started
+  tags:
+    - cluster
+    - service
+

@@ -1,0 +1,23 @@
+AddDefaultCharset utf-8
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ index.php?url=$1 [L,QSA]
+</IfModule>
+<FilesMatch "\.(html|htm|js|css)$">
+	FileETag None
+	<IfModule mod_headers.c>
+		Header unset ETag
+		Header set Cache-Control "max-age=0, no-cache, no-store, must-revalidate"
+		Header set Pragma "no-cache"
+		Header set Expires "Wed, 11 Jan 1984 05:00:00 GMT"
+	</IfModule>
+</FilesMatch>
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+	RewriteCond %{HTTP_HOST} ^www.{{ domain_name }}$ [NC]
+	RewriteRule ^(.*)$ http://{{ domain_name }}/$1 [R=301,L]
+	RewriteCond %{HTTPS} off
+ 	RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI}
+</IfModule>

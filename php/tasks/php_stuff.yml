@@ -1,0 +1,8 @@
+ - name: make site directory
+   file: path={{ site_directory }} owner={{ remote_user }} group={{ remote_group }} mode=0755 state=directory
+   tags: configure
+
+ - name: check phpinfo in site directory
+   copy: src=info.php dest={{ site_directory }}/index.php owner={{ remote_user }} group={{ remote_group }} mode=0755
+   notify: restart php
+   tags: test

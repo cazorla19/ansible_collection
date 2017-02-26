@@ -1,0 +1,10 @@
+## TO DO! One hanler per each environment
+
+- name: restart redis
+  service:
+    name: "{{ item.value.name }}"
+    state: restarted
+  with_dict: "{{ environments }}"
+
+- name: reload systemd
+  command: systemctl daemon-reload

@@ -1,0 +1,25 @@
+- name: update repo
+  apt:
+    update_cache: yes
+  tags: update
+
+- name: install kibana
+  package:
+    name: kibana
+    state: present
+    allow_unauthenticated: yes
+  tags: install
+
+- name: configure kibana
+  lineinfile:
+    dest: /etc/kibana/kibana.yml
+    regexp: '^#server.host:'
+    line: 'server.host: \"localhost\"'
+  tags: configure
+
+- name: enable and start kibana
+  service:
+    name: kibana
+    enabled: yes
+    state: started
+  tags: configure

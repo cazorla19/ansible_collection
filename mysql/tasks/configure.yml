@@ -1,0 +1,35 @@
+ - name: put .my.cnf for Ansible
+   template:
+     src: my.j2
+     dest: "{{ user_home_dir }}/.my.cnf"
+   notify: restart mysql
+   tags: configure, password
+
+ - name: ensure mysql started
+   service:
+     name: mysqld
+     state: started
+   tags: service
+
+ - name: update mysql root password
+   mysql_user:
+     name: root
+     password: "{{ mysql_root_pass }}"
+     state: present
+   tags: configure,password
+
+ - name: create application database
+   mysql_db:
+     name: "{{ mysql_db }}"
+     state: present
+   tags: db
+
+ - name: create users for application database
+   mysql_user:
+     name: "{{ item.username }}"
+     password: "{{ item.password }}"
+     priv: "{{ mysql_db }}.*:{{ item.priv }}"
+   with_items:
+     - { username: 'user_priv', priv: 'ALL,GRANT', password: 'Opriv$2016' }
+     - { username: 'user_nopriv', priv: 'SELECT', password: 'nOpriv$2016' }
+   tags: db

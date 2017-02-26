@@ -1,0 +1,57 @@
+- name: check EPEL presence [CentOS/RHEL]
+  yum: name=epel-release state=present
+  when: ansible_distribution == "CentOS" or ansible_distribution == "Red Hat Enterprise Linux"
+  tags: repo
+
+- name: ensure we won't have service collision [CentOS/RHEL]
+  yum: name=httpd state=absent
+  when: ansible_distribution == "CentOS" or ansible_distribution == "Red Hat Enterprise Linux"
+  tags: install
+
+- name: ensure we won't have service collision [Debian/Ubuntu]
+  apt: name=apache2 state=absent
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
+  tags: install
+
+- name: install packages [Debian/Ubuntu]
+  apt: name={{ item }} state=present allow_unauthenticated=yes
+  with_items:
+    - nginx
+    - apache2-utils
+    - python-passlib
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
+  tags: install
+
+- name: install packages [CentOS/RHEL]
+  yum: name={{ item }} state=present
+  with_items:
+    - nginx
+    - httpd-tools
+    - python-passlib
+  when: ansible_distribution == "CentOS" or ansible_distribution == "Red Hat Enterprise Linux"
+  tags: install
+
+#WARNING! Won't work if you don't have Python passlib library
+
+- name: set users for Kibana access
+  htpasswd: path=/etc/nginx/htpasswd.users name={{ nginx_auth_user }} password={{ nginx_auth_password }} crypt_scheme=md5_crypt
+  tags: configure
+
+- name: include directory to nginx config [CentOS/RHEL]
+  lineinfile: "dest='/etc/nginx/nginx.conf' insertbefore='}' line='include /etc/nginx/conf.d/*.conf;'"
+  when: ansible_distribution == "CentOS" or ansible_distribution == "Red Hat Enterprise Linux"
+  tags: configure
+
+- name: remove default nginx vhost [Debian/Ubuntu]
+  file: path=/etc/nginx/sites-available/default state=absent
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
+  tags: configure
+
+- name: add nginx vhost
+  template: src=kibana.j2 dest={{ nginx_vhost_file }} mode=0755
+  notify: restart nginx
+  tags: configure
+
+- name: enable and restart nginx
+  service: name=nginx enabled=yes state=restarted
+  tags: configure

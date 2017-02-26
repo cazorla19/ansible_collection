@@ -1,0 +1,9 @@
+ - name: install southbridge repo for percona
+   yum: name=southbridge-percona56-release state=present
+   tags: repo
+
+# warning: doesn't work! WIP
+#  - name: install percona
+#    yum: name=Percona-Server-server-56 state=present
+#    tags: install
+

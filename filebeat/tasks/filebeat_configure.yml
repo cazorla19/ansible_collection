@@ -1,0 +1,41 @@
+- name: enable filebeat
+  service: name=filebeat enabled=yes
+  tags:
+   - enable 
+   - configure
+
+- name: create directory for ssl key
+  file: name=/etc/pki/tls/certs state=directory mode=0755
+  tags: certificate
+
+- name: get logstash ssl certificate
+  copy: src={{ local_dir }}/logstash-forwarder.crt dest={{ ssl_cert }}
+  tags: certificate
+
+- name: place filebeat config
+  template: src={{ templates_dir }}/{{ inventory_hostname }}/filebeat.j2 dest=/etc/filebeat/filebeat.yml
+  tags:
+    - vhost 
+    - configure
+
+- name: get EC2 instance id
+  shell: curl http://169.254.169.254/latest/meta-data/instance-id
+  register: ec2_id
+  tags: ec2
+
+- name: place EC2 instance id into filebeat config
+  replace: dest=/etc/filebeat/filebeat.yml regexp='i-.*' replace='{{ ec2_id.stdout }}' backup=yes
+  notify: restart filebeat
+  tags: ec2
+
+- name: test filebeat configuration
+  command: filebeat -c /etc/filebeat/filebeat.yml -configtest
+  tags: 
+   - test
+   - vhost
+
+- name: restart filebeat
+  service: name=filebeat state=restarted
+  tags: 
+   - restart
+   - vhost

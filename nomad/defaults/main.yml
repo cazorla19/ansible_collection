@@ -1,0 +1,11 @@
+---
+
+nomad_server: example-ossec
+atlas_user: "{{ lookup('ini', 'atlas_user section=hashicorp file=../../../credentials.ini') }}"
+atlas_token: "{{ lookup('ini', 'atlas_token section=hashicorp file=../../../credentials.ini') }}"
+nomad_version: 0.4.1
+config_dir: /etc/nomad.d
+log_dir: /var/log/nomad
+data_dir: /tmp/nomad
+agent_dc: aws-oregon
+nomad_local_configs: /home/cazorla19/scripts/example-sys/nomad

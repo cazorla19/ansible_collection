@@ -1,0 +1,33 @@
+  - name: init system database
+    shell: service postgresql initdb
+    when: ansible_distribution == "CentOS" or ansible_distribution == "Red Hat Enterprise Linux" and ansible_distribution_version < 7
+    tags: initdb
+
+  - name: init system database
+    shell: postgresql-setup initdb
+    when: ansible_distribution == "CentOS" or ansible_distribution == "Red Hat Enterprise Linux" and ansible_distribution_version == 7
+    tags: initdb
+
+  - name: ensure the postgresql service is running
+    service: name=postgresql state=started enabled=yes
+    tags: configure
+
+  - name: create database for application
+    sudo_user: postgres
+    postgresql_db: name={{ postgresql_db }}
+    tags: db
+
+  - name: assign db user access to db
+    sudo_user: postgres
+    postgresql_user: db={{ postgresql_db }} name={{ remote_postgresql_user }} password={{ remote_postgresql_pass }} priv=ALL
+    tags: db
+
+  - name: ensure user does not have unnecessary privilege
+    sudo_user: postgres
+    postgresql_user: name={{ remote_postgresql_user }} role_attr_flags=NOSUPERUSER
+    tags: db
+
+  - name: change postgresql hba config
+    template: src=pg_hba.j2 dest=etc/postgresql/{{ pg_version }}/main/pg_hba.conf force=yes
+    notify: restart postgresql
+    tags: credentials

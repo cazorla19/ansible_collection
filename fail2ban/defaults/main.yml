@@ -1,0 +1,7 @@
+---
+
+nginx_access_log: /var/log/nginx/access.log
+nginx_error_log: /var/log/nginx/error.log
+nginx_port: 80
+smtp_user: example.zabbix@gmail.com
+ssh_port: 722

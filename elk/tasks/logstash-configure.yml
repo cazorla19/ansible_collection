@@ -1,0 +1,19 @@
+- name: sync logstash configuration directory
+  synchronize:
+    mode: push
+    src: "{{ logstash_configs_path }}/{{ item }}"
+    dest: /etc/logstash
+    recursive: yes
+    delete: yes
+  with_items:
+    - conf.d
+    - patterns
+  notify: restart logstash
+  tags: sync
+
+- name: test logstash configuration
+  command: "/usr/share/logstash/bin/logstash --path.settings /etc/logstash -t"
+  changed_when: False
+  tags:
+    - configure
+    - sync

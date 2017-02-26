@@ -1,0 +1,6 @@
+- name: execute java role
+  include_role:
+    name: java
+
+- include: install.yml
+- include: configure.yml

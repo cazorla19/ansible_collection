@@ -1,0 +1,2 @@
+- include: kibana_install.yml
+- include: kibana_nginx.yml

@@ -1,0 +1,27 @@
+- name: ensure nfs driver is installed
+  apt:
+    name: nfs-common
+    state: present
+  tags:
+   - install
+   - efs
+
+- name: create directory for mount
+  file:
+    path: /mnt/efs/
+    state: directory
+    mode: 0755
+  tags:
+   - directory
+   - efs
+
+- name: mount EFS filesystem
+  mount:
+    name: /mnt/efs/
+    src: "{{ efs_id }}.efs.{{ aws_region }}.amazonaws.com:/"
+    fstype: nfs4
+    opts: "nfsvers=4.1"
+    state: mounted
+  tags:
+   - mount
+   - efs

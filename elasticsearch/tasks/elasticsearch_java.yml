@@ -1,0 +1,46 @@
+- name: ensure we have tool for apt repo configuration
+  apt: name={{ item }} state=present allow_unauthenticated=yes
+  with_items:
+    - software-properties-common
+    - python-software-properties
+  tags: repo
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: add java repo [Debian/Ubuntu]
+  apt_repository: repo='deb http://ppa.launchpad.net/webupd{{ java_version }}team/java/ubuntu precise main' state=present
+  tags: 
+   - repo
+   - java
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: get java rpm package [CentOS]
+  command: 'wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/{{ java_version }}u73-b02/jdk-{{ java_version }}u73-linux-x64.rpm"'
+  args:
+    chdir: "{{ user_home }}"
+    creates: "{{ user_home }}/jdk-{{ java_version }}u73-linux-x64.rpm"
+  tags: 
+   - repo
+   - java
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: update repo [Debian/Ubuntu]
+  apt: update_cache=yes
+  tags: 
+   - update
+   - java
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: install jdk [Debian/Ubuntu]
+  apt: name={{ item }} state=present allow_unauthenticated=yes
+  with_items:
+    - oracle-java{{ java_version }}-installer
+    - oracle-java{{ java_version }}-set-default
+  tags: 
+   - install
+   - java
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: install jdk [CentOS]
+  yum: name={{ user_home }}/jdk-{{ java_version }}u73-linux-x64.rpm state=present
+  tags: install
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'

@@ -1,0 +1,13 @@
+[Unit]
+Description=Prometheus Server
+Documentation=https://prometheus.io/docs/introduction/overview/
+After=network-online.target
+
+[Service]
+User=root
+ExecStart=/bin/sh -c '{{ services['prometheus-server'].directory }}/prometheus -config.file={{ services['prometheus-server'].config }} -alertmanager.url http://localhost:9093 >> {{ services['prometheus-server'].log }} 2>&1'
+ExecReload=/usr/bin/curl -X POST http://localhost:9090/-/reload
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

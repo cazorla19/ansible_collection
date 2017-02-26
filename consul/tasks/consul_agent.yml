@@ -1,0 +1,49 @@
+- name: setup consul daemon for Ubuntu 14 nodes
+  template: src=consul_service_14.j2 dest=/etc/init/consul-agent.conf
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '14.04'
+  tags: daemon
+  
+- name: setup consul daemon for Ubuntu 16 nodes
+  template: src=consul_service_16.j2 dest=/etc/systemd/system/consul-agent.service
+  tags: daemon
+  
+- name: reload systemd on Ubuntu 16 nodes
+  shell: systemctl daemon-reload
+  tags: daemon
+  
+- name: add Consul to startup
+  service: name=consul-agent enabled=yes
+  tags: startup
+    
+- name: update services
+  copy: src={{ consul_local_configs }}/{{ item }}.json dest={{ config_dir }}/
+  with_items: "{{ consul_services }}"
+  when: consul_services is defined
+  notify: restart consul-agent
+  tags: 
+   - discovery
+   - health_check
+
+- name: update watch
+  copy: src={{ consul_local_configs }}/watch.json dest={{ config_dir }}/
+  notify: restart consul-agent
+  tags:
+    - discovery
+    - watch
+
+- name: start consul agent
+  service: name=consul-agent state=started
+  tags: service
+
+- name: check consul service state
+  shell: service consul-agent status
+  register: consul_state
+  tags: check
+  
+- name: print consul service state
+  debug: msg={{ consul_state.stdout }}
+  tags: check
+
+- name: restart consul-agent
+  service: name=consul-agent state=restarted
+  tags: restart

@@ -1,0 +1,12 @@
+---
+
+consul_server: example-ossec
+atlas_user: "{{ lookup('ini', 'atlas_user section=hashicorp file=../../../credentials.ini') }}"
+atlas_token: "{{ lookup('ini', 'atlas_token section=hashicorp file=../../../credentials.ini') }}"
+consul_version: 0.7.0
+dashboard_dir: /var/www
+config_dir: /etc/consul.d
+log_dir: /var/log/consul
+data_dir: /tmp/consul
+agent_dc: aws-oregon
+consul_local_configs: /home/cazorla19/scripts/example-sys/consul

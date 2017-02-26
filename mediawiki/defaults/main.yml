@@ -1,0 +1,6 @@
+---
+
+site_directory: /var/www/html
+wiki_major_ver: 1.26
+wiki_minor_ver: 3
+site_domain_name: localhost

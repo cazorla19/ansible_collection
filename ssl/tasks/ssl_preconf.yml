@@ -1,0 +1,32 @@
+ - name: ensure we have certificate directory
+   file: path={{ cert_directory }} state=directory owner={{ remote_user }} mode=0755
+   tags: pre_conf
+
+ - name: generate the private key
+   command: openssl genrsa 4096 > {{ domain_name }}.key
+   args:
+     chdir: "{{ cert_directory }}"
+     creates: "{{ cert_directory }}/{{ domain_name }}.key"
+   notify: set rights
+   tags: pre_conf
+
+ - name: get csr-request template to remote
+   template: src={{ item }}.j2 dest={{ cert_directory }}/{{ item }} mode=0755
+   with_items:
+      - request.exp
+      - csr.sh
+   tags: pre_conf
+
+ - name: create csr request
+   command: ./request.exp
+   args:
+     chdir: "{{ cert_directory }}"
+     creates: "{{ cert_directory }}/domain_name.src"
+   tags: pre_conf
+
+ - name: backup files to local directory
+   fetch: src={{ cert_directory }}/{{ domain_name }}.{{ item }} dest={{ local_directory }}/{{ domain_name }}.{{ item }} flat=yes
+   with_items:
+      - key
+      - csr
+   tags: pre_conf

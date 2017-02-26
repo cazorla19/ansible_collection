@@ -1,0 +1,5 @@
+---
+
+remote_postgresql_user: admin
+remote_postgresql_pass: admin
+postgresql_db: test

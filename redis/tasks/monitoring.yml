@@ -1,0 +1,53 @@
+- name: ensure we have a directory for files
+  file:
+    path: /opt/redis-monitoring
+    state: directory
+    owner: root
+    mode: 0755
+  tags:
+   - monitoring
+   - directory
+
+- name: get the exporter
+  unarchive:
+    src: "https://github.com/oliver006/redis_exporter/releases/download/v{{ exporter_version }}/redis_exporter-v{{ exporter_version }}.linux-amd64.tar.gz"
+    dest: /opt/redis-monitoring
+    remote_src: yes
+  tags:
+    - monitoring
+    - install
+
+- name: flush start script
+  template:
+    src: redis-monitoring.j2
+    dest: /opt/redis-monitoring/redis-monitoring.sh
+    mode: 0755
+  tags:
+    - monitoring
+    - configure
+
+- name: flush systemd service
+  copy:
+    src: redis-exporter.service
+    dest: /lib/systemd/system/redis-exporter.service
+    mode: 0644
+  register: daemon
+  tags:
+    - monitoring
+    - configure
+
+- name: reload systemctl
+  command: systemctl daemon-reload
+  when: daemon.changed
+  tags:
+   - monitoring
+   - configure
+
+- name: launch exporter
+  service:
+    name: redis-exporter
+    enabled: yes
+    state: started
+  tags:
+   - monitoring
+   - service

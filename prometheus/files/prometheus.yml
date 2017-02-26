@@ -1,0 +1,349 @@
+global:
+  scrape_interval:     60s # Default is every 1 minute.
+  evaluation_interval: 60s # The default is every 1 minute.
+
+  # Attach these labels to any time series or alerts when communicating with
+  # external systems (federation, remote storage, Alertmanager).
+  external_labels:
+      monitor: 'example-monitor'
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  - "alerts/host.rules"
+  - "alerts/docker.rules"
+  - "alerts/db.rules"
+  - "alerts/example-frontend.rules"
+  - "alerts/example-api.rules"
+#  - "alerts/example-custom.rules"
+  #coming soon
+# - "alerts/mobile.rules"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'prometheus'
+
+    static_configs:
+      - targets: ['localhost:9090']
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'go_(.*)'
+        action: drop
+      - source_labels: [__name__]
+        regex: 'http_(.*)'
+        action: drop
+
+  - job_name: 'service_metrics'
+
+    ec2_sd_configs:
+      - region: eu-west-1
+        profile: default
+        port: 9100
+    relabel_configs:
+    - source_labels: [__meta_ec2_public_ip]
+      regex:  '(.*)'             # This is the default value.
+      target_label: __address__
+      replacement: '${1}:9100'   # Have to specify a port too.
+    - source_labels: [__meta_ec2_tag_Name]
+      target_label: instance
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'go_(.*)'
+        action: drop
+      - source_labels: [__name__]
+        regex: 'http_(.*)'
+        action: drop
+      - source_labels: [__name__]
+        regex: 'node_e(.*)'
+        action: drop
+      - source_labels: [__name__]
+        regex: 'node_netstat_(.*)'
+        action: drop
+      - source_labels: [__name__]
+        regex: 'node_procs_(.*)'
+        action: drop
+      - source_labels: [__name__]
+        regex: 'node_sockstat_(.*)'
+        action: drop
+      - source_labels: [__name__]
+        regex: 'node_vmstat_(.*)'
+        action: drop
+      - source_labels: [__name__]
+        regex: 'process_(.*)'
+        action: drop
+
+  - job_name: 'blackbox-ssh'
+    metrics_path: /probe
+    params:
+      module: [ssh_banner]
+    ec2_sd_configs:
+      - region: eu-west-1
+        profile: default
+        port: 9115
+    relabel_configs:
+    # Ensure port is 22, pass as URL parameter
+    - source_labels: [__meta_ec2_public_ip]
+      regex: (.*)(:.*)?
+      replacement: ${1}:22
+      target_label: __param_target
+    # Make instance label the target
+    - source_labels: [__meta_ec2_tag_Name]
+      target_label: instance
+    # Actually talk to the blackbox exporter though
+    - target_label: __address__
+      replacement: 127.0.0.1:9115
+
+  - job_name: 'blackbox-icmp'
+    metrics_path: /probe
+    params:
+      module: [icmp]
+    ec2_sd_configs:
+      - region: eu-west-1
+        profile: default
+        port: 9115
+    relabel_configs:
+    # Ensure port is 22, pass as URL parameter
+    - source_labels: [__meta_ec2_public_ip]
+      regex: (.*)(:.*)?
+      replacement: ${1}
+      target_label: __param_target
+    # Make instance label the target
+    - source_labels: [__meta_ec2_tag_Name]
+      target_label: instance
+    # Actually talk to the blackbox exporter though
+    - target_label: __address__
+      replacement: 127.0.0.1:9115
+
+  - job_name: 'containers'
+
+    ec2_sd_configs:
+      - region: eu-west-1
+        profile: default
+        port: 9080
+    relabel_configs:
+    - source_labels: [__meta_ec2_public_ip]
+      regex:  '(.*)'             # This is the default value.
+      target_label: __address__
+      replacement: '${1}:9080'   # Have to specify a port too.
+    - source_labels: [__meta_ec2_tag_Name]
+      target_label: instance
+    metric_relabel_configs:
+    - source_labels: [__name__]
+      regex: 'go_(.*)'
+      action: drop
+    - source_labels: [__name__]
+      regex: 'http_(.*)'
+      action: drop
+
+  - job_name: redis_exporter
+
+    ec2_sd_configs:
+      - region: eu-west-1
+        profile: default
+        port: 9121
+    relabel_configs:
+    - source_labels: [__meta_ec2_public_ip]
+      regex:  '(.*)'             # This is the default value.
+      target_label: __address__
+      replacement: '${1}:9121'   # Have to specify a port too.
+    - source_labels: [__meta_ec2_tag_Name]
+      target_label: instance
+    metric_relabel_configs:
+    - source_labels: [__name__]
+      regex: 'go_(.*)'
+      action: drop
+    - source_labels: [__name__]
+      regex: 'http_(.*)'
+      action: drop
+
+  - job_name: redis_exporter_custom
+  # for redis.example.net
+    static_configs:
+      - targets:
+        - 'redis.example.net:9121'
+        - 'redis.example.net:9122'
+        - 'redis.example.net:9123'
+        - 'redis.example.net:9124'
+        - 'redis.example.net:9125'
+        - 'redis.example.net:9126'
+    relabel_configs:
+    - source_labels: [__address__]
+      regex: '.*:(9121)'
+      target_label: instance
+      replacement: 'redis-market-dev:${1}'
+    - source_labels: [__address__]
+      regex: '.*:(9122)'
+      target_label: instance
+      replacement: 'redis-market-sit:${1}'
+    - source_labels: [__address__]
+      regex: '.*:(9123)'
+      target_label: instance
+      replacement: 'redis-market-production:${1}'
+    - source_labels: [__address__]
+      regex: '.*:(9124)'
+      target_label: instance
+      replacement: 'redis-user-dev:${1}'
+    - source_labels: [__address__]
+      regex: '.*:(9125)'
+      target_label: instance
+      replacement: 'redis-user-sit:${1}'
+    - source_labels: [__address__]
+      regex: '.*:(9126)'
+      target_label: instance
+      replacement: 'redis-user-production:${1}'
+    metric_relabel_configs:
+    - source_labels: [__name__]
+      regex: 'go_(.*)'
+      action: drop
+    - source_labels: [__name__]
+      regex: 'http_(.*)'
+      action: drop
+
+  - job_name: es_exporter
+
+    metrics_path: "/_prometheus/metrics"
+    ec2_sd_configs:
+      - region: eu-west-1
+        profile: default
+        port: 9200
+    relabel_configs:
+    - source_labels: [__meta_ec2_public_ip]
+      regex:  '(.*)'             # This is the default value.
+      target_label: __address__
+      replacement: '${1}:9200'   # Have to specify a port too.
+    - source_labels: [__meta_ec2_tag_Name]
+      target_label: instance
+
+  - job_name: data-api
+
+    metrics_path: "/api/v1/data/debug/metrics/prometheus"
+    ec2_sd_configs:
+      - region: eu-west-1
+        profile: default
+        port: 80
+    relabel_configs:
+    - source_labels: [__meta_ec2_public_ip]
+      regex:  '(.*)'             # This is the default value.
+      target_label: __address__
+      replacement: '${1}:80'   # Have to specify a port too.
+    - source_labels: [__meta_ec2_tag_Name]
+      target_label: instance
+
+  - job_name: market-api
+
+    metrics_path: "/api/v1/market/debug/metrics/prometheus"
+    ec2_sd_configs:
+      - region: eu-west-1
+        profile: default
+        port: 80
+    relabel_configs:
+    - source_labels: [__meta_ec2_public_ip]
+      regex:  '(.*)'             # This is the default value.
+      target_label: __address__
+      replacement: '${1}:80'   # Have to specify a port too.
+    - source_labels: [__meta_ec2_tag_Name]
+      target_label: instance
+
+  - job_name: user-api
+
+    metrics_path: "/api/v1/user/debug/metrics/prometheus"
+    ec2_sd_configs:
+      - region: eu-west-1
+        profile: default
+        port: 80
+    relabel_configs:
+    - source_labels: [__meta_ec2_public_ip]
+      regex:  '(.*)'             # This is the default value.
+      target_label: __address__
+      replacement: '${1}:80'   # Have to specify a port too.
+    - source_labels: [__meta_ec2_tag_Name]
+      target_label: instance
+
+  - job_name: spaces-api
+
+    metrics_path: "/api/v1/spaces/debug/metrics/prometheus"
+    ec2_sd_configs:
+      - region: eu-west-1
+        profile: default
+        port: 80
+    relabel_configs:
+    - source_labels: [__meta_ec2_public_ip]
+      regex:  '(.*)'             # This is the default value.
+      target_label: __address__
+      replacement: '${1}:80'   # Have to specify a port too.
+    - source_labels: [__meta_ec2_tag_Name]
+      target_label: instance
+
+  - job_name: scb-portfolio-api
+
+    metrics_path: "/api/v1/scb_portfolio/debug/metrics/prometheus"
+    ec2_sd_configs:
+      - region: eu-west-1
+        profile: default
+        port: 80
+    relabel_configs:
+    - source_labels: [__meta_ec2_public_ip]
+      regex:  '(.*)'             # This is the default value.
+      target_label: __address__
+      replacement: '${1}:80'   # Have to specify a port too.
+    - source_labels: [__meta_ec2_tag_Name]
+      target_label: instance
+
+  - job_name: nginx
+
+    metrics_path: "/metrics"
+    ec2_sd_configs:
+      - region: eu-west-1
+        profile: default
+        port: 9145
+    relabel_configs:
+    - source_labels: [__meta_ec2_public_ip]
+      regex:  '(.*)'             # This is the default value.
+      target_label: __address__
+      replacement: '${1}:9145'   # Have to specify a port too.
+    - source_labels: [__meta_ec2_tag_Name]
+      target_label: instance
+
+  - job_name: tarantool_exporter
+
+    metrics_path: "/metrics"
+    static_configs:
+      - targets: ['tarantool.example.net:8080']
+
+  - job_name: postgres_exporter
+
+    metrics_path: "/metrics"
+    static_configs:
+      - targets: ['b0.sd-dev.example.net:9187']
+
+  - job_name: etcd
+
+    static_configs:
+    - targets:
+      - 'cluster-manager.dev.example.net:2379'
+
+  - job_name: kube-api-server
+
+    scheme: https
+    static_configs:
+    - targets:
+      - 'cluster-manager.dev.example.net:10250'
+    tls_config:
+      insecure_skip_verify: true
+
+  - job_name: kube-api-exporter
+
+    static_configs:
+    - targets:
+      - 'cluster-manager.dev.example.net:9081'
+
+  - job_name: graylog_exporter
+
+    metrics_path: '/api/plugins/org.graylog.plugins.metrics.prometheus/metrics'
+    basic_auth:
+      username: example
+      password: highsky
+    static_configs:
+      - targets:
+        - 'elk.example.net:12900'

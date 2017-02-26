@@ -1,0 +1,8 @@
+#!/bin/bash
+
+./redis_exporter -redis.addr redis://localhost:{{ environments['market-dev'].port }} -redis.password {{ environments['market-dev'].password }} -web.listen-address 0.0.0.0:9121 &
+./redis_exporter -redis.addr redis://localhost:{{ environments['market-sit'].port }} -redis.password {{ environments['market-sit'].password }} -web.listen-address 0.0.0.0:9122 &
+./redis_exporter -redis.addr redis://localhost:{{ environments['market-production'].port }} -redis.password {{ environments['market-production'].password }} -web.listen-address 0.0.0.0:9123 &
+./redis_exporter -redis.addr redis://localhost:{{ environments['user-dev'].port }} -redis.password {{ environments['user-dev'].password }} -web.listen-address 0.0.0.0:9124 &
+./redis_exporter -redis.addr redis://localhost:{{ environments['user-sit'].port }} -redis.password {{ environments['user-sit'].password }} -web.listen-address 0.0.0.0:9125 &
+./redis_exporter -redis.addr redis://localhost:{{ environments['user-production'].port }} -redis.password {{ environments['user-production'].password }} -web.listen-address 0.0.0.0:9126 &

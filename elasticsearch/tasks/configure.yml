@@ -1,0 +1,22 @@
+- name: flush elasticsearch config
+  template:
+    src: elasticsearch.j2
+    dest: /etc/elasticsearch/elasticsearch.yml
+  notify: restart elasticsearch
+  tags: configure
+
+- name: check monitoring agent
+  uri:
+    url: "localhost:9200/_prometheus/metrics"
+  delegate_to: "{{ inventory_hostname }}"
+  register: monitoring_check
+  ignore_errors: yes
+  tags:
+    - monitoring
+
+- name: setup Elasticsearch monitoring agent
+  command: "/usr/share/elasticsearch/bin/elasticsearch-plugin install -b https://github.com/vvanholl/elasticsearch-prometheus-exporter/releases/download/{{ es_minor_version }}/elasticsearch-prometheus-exporter-{{ es_minor_version }}.zip"
+  when: monitoring_check|failed
+  notify: restart elasticsearch
+  tags:
+    - monitoring

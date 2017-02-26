@@ -1,0 +1,3 @@
+#!/bin/bash
+
+sudo openssl req -new -key {{ cert_directory }}/{{ domain_name }}.key > {{ cert_directory }}/{{ domain_name }}.csr

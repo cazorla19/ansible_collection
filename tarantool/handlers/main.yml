@@ -1,0 +1,4 @@
+- name: restart tarantool
+  service:
+    name: tarantool
+    state: restarted

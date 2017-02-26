@@ -1,0 +1,7 @@
+---
+
+chroot_user1: "{{ lookup('ini', 'auth_user section=nginx file=../../../credentials.ini') }}"
+chroot_user1_password: "{{ lookup('ini', 'auth_password section=nginx file=../../../credentials.ini') }}"
+chroot_group: ftp-users
+chroot_dir: /mnt/example-ftp
+vsftpd_config: /etc/vsftpd.conf

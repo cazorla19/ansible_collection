@@ -1,0 +1,23 @@
+- name: place filebeat config
+  template:
+    src: "{{ filebeat_host }}.j2"
+    dest: /etc/filebeat/filebeat.yml
+  notify: restart filebeat
+  tags:
+    - vhost
+    - configure
+
+- name: test filebeat configuration
+  command: /usr/share/filebeat/bin/filebeat -c /etc/filebeat/filebeat.yml -configtest
+  tags:
+   - test
+   - vhost
+
+- name: start filebeat
+  service:
+    name: filebeat
+    state: started
+    enabled: yes
+  tags:
+   - restart
+   - vhost

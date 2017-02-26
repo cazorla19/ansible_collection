@@ -1,0 +1,33 @@
+- name: install luarocks
+  apt:
+    name: luarocks
+    state: present
+  tags:
+    - luarocks
+    - install
+
+- name: set luarocks config
+  copy:
+    src: luarocks-config.lua
+    dest: /etc/luarocks/config.lua
+    mode: 0644
+  tags:
+    - luarocks
+    - configure
+
+- name: install luarocks modules
+  command: "luarocks install {{ item }}"
+  with_items:
+    - queue
+    - tarantool-prometheus
+  tags:
+    - luarocks
+    - queue
+    - prometheus
+
+- name: install few modules through apt
+  apt:
+    name: tarantool-http
+    state: present
+  tags:
+    - prometheus

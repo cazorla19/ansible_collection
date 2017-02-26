@@ -1,0 +1,40 @@
+- name: init system database
+  shell: service postgresql initdb
+  tags: initdb
+
+- name: ensure the postgresql service is running
+  service:
+    name: postgresql
+    state: started
+    enabled: yes
+  tags: configure
+
+- name: create database for application
+  become_user: postgres
+  postgresql_db:
+    name: "{{ postgresql_db }}"
+  tags: db
+
+- name: assign db user access to db
+  become_user: postgres
+  postgresql_user:
+    db: "{{ postgresql_db }}"
+    name: "{{ remote_postgresql_user }}"
+    password: "{{ remote_postgresql_pass }}"
+    priv: ALL
+  tags: db
+
+- name: ensure user does not have unnecessary privilege
+  become_user: postgres
+  postgresql_user:
+    name: "{{ remote_postgresql_user }}"
+    role_attr_flags: NOSUPERUSER
+  tags: db
+
+- name: change postgresql hba config
+  template:
+    src: pg_hba.j2
+    dest: /etc/postgresql/{{ pg_version }}/main/pg_hba.conf
+    force: yes
+  notify: restart postgresql
+  tags: credentials

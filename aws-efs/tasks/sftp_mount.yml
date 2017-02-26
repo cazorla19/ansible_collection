@@ -1,0 +1,65 @@
+- name: ensure we have sshfs installed
+  apt:
+    name: sshfs
+    state: present
+  tags: install
+
+- name: put ssh config to root user
+  copy:
+    src: ssh-config
+    dest: /root/.ssh/config
+    owner: root
+    group: root
+    mode: 0600
+  tags:
+    - config
+    - sshfs
+
+- name: check mount point
+  stat:
+    path: /mnt/sftp/
+  register: mountpoint
+  tags:
+    - directory
+    - sshfs
+
+- name: create mount point
+  file:
+    path: /mnt/sftp/
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+  when: mountpoint.stat.exists is not defined
+  tags:
+    - directory
+    - sshfs
+
+- name: mount sshfs permamently
+  mount:
+    name: /mnt/sftp/
+    src: sftp.sovcombank.ru:/
+    fstype: fuse.sshfs
+    opts: "rw,noexec,nosuid,nodev,allow_other"
+    state: mounted
+  register: sftp_mount
+  tags:
+   - mount
+   - sshfs
+
+- name: restart machine after mount
+  shell: reboot
+  async: 0
+  poll: 0
+  when: sftp_mount.changed
+  tags:
+   - mount
+   - sshfs
+
+- name: waiting for server to come back after upgrade
+  local_action: wait_for host={{ ansible_ssh_host }} state=started
+  sudo: False
+  when: sftp_mount.changed
+  tags:
+   - mount
+   - sshfs

@@ -1,0 +1,42 @@
+- name: ensure we have python apt module
+  apt:
+    name: python-apt
+    state: present
+  tags: dependencies
+
+- name: add tarantool repository
+  template:
+    src: tarantool-repo.j2
+    dest: /etc/apt/sources.list.d/tarantool.list
+  tags: repo
+
+- name: add key for repo
+  apt_key:
+    url: "http://download.tarantool.org/tarantool/{{ tarantool_version }}/gpgkey"
+    state: present
+  tags: repo
+
+- name: update repository cache
+  apt:
+    update_cache: yes
+  tags: update
+
+- name: install tarantool
+  apt:
+    name: tarantool
+    state: present
+  tags: install
+
+- name: start tarantool
+  service:
+    name: tarantool
+    enabled: yes
+    state: started
+  tags: service
+
+  # TO DO: rewrite to built-in apt-mark
+  # when it will be ready in new version
+
+- name: keep tarantool from accidental updates
+  command: "apt-mark hold tarantool"
+  tags: mark

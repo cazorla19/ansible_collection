@@ -1,0 +1,8 @@
+ - name: install mysql
+   package:
+     name: "{{ item }}"
+     state: present
+   with_items:
+     - mysql-server
+     - MySQL-python
+   tags: install

@@ -1,0 +1,12 @@
+[Unit]
+Description=Prometheus Client (Redis Exporter)
+Documentation=https://prometheus.io/docs/introduction/overview/
+After=network-online.target
+
+[Service]
+ExecStart=/bin/sh -c './redis-monitoring.sh >> /var/log/redis/exporter.log 2>&1'
+WorkingDirectory=/opt/redis-monitoring
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

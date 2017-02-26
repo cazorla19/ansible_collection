@@ -1,0 +1,32 @@
+- name: disable server tokens
+  lineinfile:
+    dest: /etc/nginx/nginx.conf
+    regexp: "^\t# server_tokens"
+    line: "\tserver_tokens off;"
+  notify: reload nginx
+  tags:
+    - configure
+
+- name: unlink deafault vhost
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  tags:
+    - configure
+
+- name: place suitable vhost
+  template:
+    src: "{{ inventory_hostname }}.j2"
+    dest: "/etc/nginx/sites-available/{{ vhost }}"
+  notify: reload nginx
+  tags:
+    - vhost
+    - configure
+
+- name: link vhost
+  file:
+    src: "/etc/nginx/sites-available/{{ vhost }}"
+    dest: "/etc/nginx/sites-enabled/{{ vhost }}"
+    state: link
+  tags:
+    - configure

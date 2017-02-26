@@ -1,0 +1,43 @@
+---
+
+prometheus_root: /opt/prometheus
+prometheus_logs: /var/log/prometheus
+
+prometheus_config: "{{ prometheus_root }}/prometheus/prometheus.yml"
+alertmanager_config: "{{ prometheus_root }}/alertmanager/simple.yml"
+
+services:
+  prometheus-server:
+    id: prometheus
+    directory: "{{ prometheus_root }}/prometheus"
+    version: 1.4.1
+    config: "{{ prometheus_root }}/prometheus/prometheus.yml"
+    config_relative_name: prometheus.yml
+    log: "{{ prometheus_logs }}/prometheus-server.log"
+  prometheus-alertmanager:
+    id: alertmanager
+    directory: "{{ prometheus_root }}/alertmanager"
+    version: 0.5.1
+    config: "{{ prometheus_root }}/alertmanager/simple.yml"
+    config_relative_name: simple.yml
+    log: "{{ prometheus_logs }}/alertmanager.log"
+  prometheus-pushgateway:
+    id: pushgateway
+    directory: "{{ prometheus_root }}/pushgateway"
+    version: 0.3.1
+    log: "{{ prometheus_logs }}/pushgateway.log"
+  prometheus-node-exporter:
+    id: node_exporter
+    directory: "{{ prometheus_root }}/node_exporter"
+    version: 0.13.0
+    log: "{{ prometheus_logs }}/node_exporter.log"
+  prometheus-blackbox-exporter:
+    id: blackbox_exporter
+    directory: "{{ prometheus_root }}/blackbox_exporter"
+    version: 0.4.0
+    log: "{{ prometheus_logs }}/blackbox_exporter.log"
+
+kube_tokens:
+  dev: "{{ lookup('ini', 'dev_token_api section=kubernetes file=secure.ini') }}"
+
+alerts_directory: '..'

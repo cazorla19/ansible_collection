@@ -1,0 +1,12 @@
+---
+
+wp_version: 4.2
+
+auto_up_disable: false
+core_update_level: true
+
+wp_db_name: wordpress
+wp_db_user: wordpress
+wp_db_password: wordpress
+wp_db_host: cycloid-db.cud9kwls0l4g.us-west-2.rds.amazonaws.com
+site_directory: /var/www

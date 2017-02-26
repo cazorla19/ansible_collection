@@ -1,0 +1,15 @@
+ - name: configure southbridge repo for mysql
+   yum: name=southbridge-mysql57-release
+   tags: repo
+
+ - name: install mysql
+   yum: name="{{ item }}" state=present disablerepo='*' enablerepo='southbridge*'
+   with_items:
+     - "mysql-server"
+   tags: install
+
+ - name: install python driver for mysql
+   yum: name="{{ item }}" state=present
+   with_items:
+     - "MySQL-python"
+   tags: install

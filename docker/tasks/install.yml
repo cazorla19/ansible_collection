@@ -1,0 +1,19 @@
+- name: install docker package
+  apt:
+    name: docker-engine
+    state: present
+    allow_unauthenticated: yes
+  tags: install
+
+- name: ensure docker has been started
+  service:
+    name: docker
+    enabled: yes
+    state: started
+  tags: service
+
+- name: freeze auto upgrade for docker
+  command: apt-mark hold docker
+  tags:
+    - freeze
+    - install

@@ -1,0 +1,21 @@
+---
+
+cert_directory: /etc/ssl
+domain_name: 123example
+domain_cert_name: 123example_com
+local_directory: /opt
+apache_config: /etc/httpd/conf/httpd.conf
+apache_directory: /etc/httpd
+apache_daemon: httpd
+ssl_config: /etc/httpd/conf.d/ssl.conf
+site_directory: /var/www/html
+site_ip_add: 192.168.0.5
+domain_country: RU
+site_state: Moscow
+site_city: Moscow
+organization: 123example
+organization_section: IT
+domain_full_name: 123example.com
+organization_email: admin@123example.com
+remote_user: root
+remote_group: root

@@ -1,0 +1,36 @@
+- name: add key for repo
+  apt_key:
+    url: "https://pkg.jenkins.io/debian-stable/jenkins.io.key"
+    state: present
+  tags: repo
+
+- name: add jenkins repository
+  apt_repository:
+    repo: deb https://pkg.jenkins.io/debian-stable binary/
+    state: present
+  tags: repo
+
+- name: update repository cache
+  apt:
+    update_cache: yes
+  tags: update
+
+- name: install jenkins
+  apt:
+    name: jenkins
+    state: present
+  tags: install
+
+- name: start jenkins
+  service:
+    name: jenkins
+    enabled: yes
+    state: started
+  tags: service
+
+  # TO DO: rewrite to built-in apt-mark
+  # when it will be ready in new version
+
+- name: keep jenkins from accidental updates
+  command: "apt-mark hold jenkins"
+  tags: mark

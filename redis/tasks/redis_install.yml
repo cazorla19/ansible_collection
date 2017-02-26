@@ -1,0 +1,4 @@
+ - name: install packages [Debian/Ubuntu]
+   apt: name=redis-server state=present
+   when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
+   tags: install

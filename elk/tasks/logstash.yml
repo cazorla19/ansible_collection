@@ -1,0 +1,29 @@
+- name: get logstash repo
+  apt_repository:
+    repo: 'deb https://artifacts.elastic.co/packages/{{ elk_major_version }}.x/apt stable main'
+    state: present
+  tags: repo
+
+- name: update repo
+  apt:
+    update_cache: yes
+  tags: update
+
+- name: install logstash
+  package:
+    name: logstash
+    state: present
+    allow_unauthenticated: yes
+  tags: install
+
+- name: enable and start logstash
+  service:
+    name: logstash
+    enabled: yes
+    state: started
+  tags:
+    - configure
+    - service
+
+- name: configure logstash
+  include: logstash-configure.yml

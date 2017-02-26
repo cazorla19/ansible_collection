@@ -1,0 +1,22 @@
+ - name: make sure vsftpd is installed
+   package: name=vsftpd-basic state=present
+   tags: install
+
+ - name: register group for ftp access
+   group: name={{ chroot_group }} state=present
+   tags: users
+
+ - name: ensure we have existed chroot directory
+   file: path={{ chroot_dir }} state=directory group={{ chroot_group }} mode=0775
+   tags: directory
+
+ - name: register users for ftp access
+   user: name={{ item.user }} group={{ chroot_group }} home={{ chroot_dir }} password={{ item.password }} shell=/usr/sbin/nologin
+   with_items: 
+     - { user: "{{ chroot_user1 }}", password: "{{ chroot_user1_password }}" }
+   tags: users
+
+ - name: configure vsftpd
+   file: src=vsftpd.conf dest={{ vsftpd_config }} force=yes
+   notify: restart vsftpd
+   tags: configure

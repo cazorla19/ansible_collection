@@ -1,0 +1,11 @@
+[Unit]
+Description=Prometheus Push Gateway for batch metrics
+Documentation=https://prometheus.io/docs/introduction/overview/
+After=network-online.target
+
+[Service]
+ExecStart=/bin/sh -c '{{ services['prometheus-pushgateway'].directory }}/pushgateway >> {{ services['prometheus-pushgateway'].log }} 2>&1'
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,16 @@
+data_dir = "{{ data_dir }}"
+datacenter = "aws_oregon"
+
+client {
+    enabled = true
+}
+
+consul {
+    address = "127.0.0.1:8500"
+}
+
+atlas {
+  join = true
+  infrastructure = "{{ atlas_user }}/mars"
+  token = "{{ atlas_token }}"
+}

@@ -1,0 +1,24 @@
+- name: restart prometheus
+  service:
+    name: "{{ item }}"
+    state: restarted
+  with_items:
+    - prometheus-server
+    - prometheus-alertmanager
+    - prometheus-node-exporter
+    - prometheus-pushgateway
+
+- name: restart node-exporter
+  service:
+    name: prometheus-node-exporter
+    state: restarted
+
+- name: restart server
+  service:
+    name: prometheus-server
+    state: restarted
+
+- name: restart alertmanager
+  service:
+    name: prometheus-alertmanager
+    state: restarted

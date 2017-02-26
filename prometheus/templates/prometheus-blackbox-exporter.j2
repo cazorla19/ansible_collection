@@ -1,0 +1,12 @@
+[Unit]
+Description=Prometheus Client (Blackbox Exporter)
+Documentation=https://prometheus.io/docs/introduction/overview/
+After=network-online.target
+
+[Service]
+ExecStart=/bin/sh -c './blackbox_exporter >> {{ services['prometheus-blackbox-exporter'].log }} 2>&1'
+WorkingDirectory={{ services['prometheus-blackbox-exporter'].directory }}
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

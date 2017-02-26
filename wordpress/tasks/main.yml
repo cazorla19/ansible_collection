@@ -1,0 +1,48 @@
+- name: download wordpress
+  unarchive:
+    src: "http://wordpress.org/wordpress-{{ wp_version }}.tar.gz"
+    dest: "{{ site_directory }}/"
+    remote_src: true
+  tags: download
+
+- name: add group wordpress
+  group:
+    name: wordpress
+  tags: group
+
+- name: add user wordpress
+  user:
+    name: wordpress
+    group: wordpress
+    home: "{{ site_directory }}/"
+  tags: user
+
+- name: get salt for wordpress
+  local_action: uri url=https://api.wordpress.org/secret-key/1.1/salt/ return_content=yes
+  register: wp_salt
+  become: no
+  tags: salt
+
+- name: copy wordpress config
+  template:
+    src: wp-config.php
+    dest: "{{ site_directory }}/wordpress/"
+  tags: configure
+
+- name: change wordpress directory owner
+  file:
+    path: "{{ site_directory }}/"
+    owner: wordpress
+    group: wordpress
+    state: directory
+    recurse: yes
+  tags: user
+
+- name: ensure php-fpm is running
+  service:
+    name: php7.0-fpm
+    state: started
+    enabled: yes
+  tags:
+    - php
+    - service

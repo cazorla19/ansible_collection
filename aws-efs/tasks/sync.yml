@@ -1,0 +1,16 @@
+- name: ensure parallel is installed
+  apt:
+    name: parallel
+    state: present
+  tags:
+   - sync
+
+  # ЧТО ДЕЛАЕТ ЭТА КОМАНДА?
+  # Основная задача: синхронизация SFTP с EFS
+  # ls получает список директорий в SFTP
+  # Для каждой сабдиректории запускается отдельный rsync с EFS
+  # Через команду parallel (-j4 означает выполнение 4-х concurrent процессов)
+- name: sync SFTP and EFS
+  shell: 'ls --indicator-style=none /mnt/sftp/dfs/ | parallel -v -j4 rsync -raz --progress /mnt/sftp/dfs/{} /mnt/efs/dfs/{}'
+  tags:
+    - sync

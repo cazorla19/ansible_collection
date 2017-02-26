@@ -1,0 +1,63 @@
+- name: ensure we have kube tokens directory
+  file:
+    path: "{{ services['prometheus-server'].directory }}/kube_tokens"
+    state: directory
+    owner: ubuntu
+    group: ubuntu
+    mode: 0600
+  tags:
+   - configure
+   - tokens
+   - server
+
+- name: flush all tokens
+  lineinfile:
+    dest: "{{ services['prometheus-server'].directory }}/kube_tokens/{{ item }}"
+    line: "{{ kube_tokens.get(item) }}"
+    state: present
+    mode: 0600
+    create: yes
+  with_items:
+    - dev
+  tags:
+   - configure
+   - tokens
+   - server
+
+- name: flush prometheus server config
+  copy:
+    src: prometheus.yml
+    dest: "{{ services['prometheus-server'].config }}"
+    mode: 0644
+  notify: restart server
+  tags:
+    - configure
+    - server
+
+- name: create directory for alerts
+  file:
+    path: "{{ services['prometheus-server'].directory }}/alerts"
+    state: directory
+  tags:
+    - configure
+    - server
+
+- name: sync alerts directory
+  synchronize:
+    src: "{{ alerts_directory }}/alerts/"
+    dest: "{{ services['prometheus-server'].directory }}/alerts/"
+    recursive: yes
+  notify: restart server
+  tags:
+    - configure
+    - server
+
+- name: flush prometheus alertmanager config
+  copy:
+    src: simple.yml
+    dest: "{{ services['prometheus-alertmanager'].config }}"
+    mode: 0644
+  notify: restart alertmanager
+  tags:
+    - configure
+    - alertmanager

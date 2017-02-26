@@ -1,0 +1,25 @@
+- name: move php configuration template for database migration
+  template: src=main-local.j2 dest={{ site_directory }}/common/config/main-local.php force=yes owner={{ remote_user }} group={{ remote_group }} mode=0755
+  tags: database
+
+- name: ensure mysql is running
+  service: name=mysql state=started
+  tags: database
+
+- name: put mysql config under user directory
+  template: src=.my.j2 dest={{ remote_user_home_dir }}/.my.cnf
+  tags: database
+
+- name: create database
+  mysql_db: name={{ mysql_db }} state=present login_user=root login_password={{ mysql_root_pass }}
+  tags: database
+
+- name: create user for database
+  mysql_user: name={{ remote_user }} password={{ remote_mysql_pass }} priv={{ mysql_db }}.*:ALL,GRANT login_user=root login_password={{ mysql_root_pass }}
+  tags: database
+
+- name: migrate database
+  shell: "yes | php yii migrate"
+  args:
+    chdir: "{{ site_directory }}"
+  tags: database

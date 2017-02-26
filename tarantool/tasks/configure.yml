@@ -1,0 +1,43 @@
+- name: put tarantool config
+  template:
+    src: "{{ item.value.name }}.lua"
+    dest: "/etc/tarantool/instances.available/{{ item.value.name }}.lua"
+    mode: 0644
+  notify: restart tarantool
+  with_dict: "{{ environments }}"
+  tags: configure
+
+- name: append monitoring configuration
+  copy:
+    src: prometheus-config.lua
+    dest: /etc/tarantool/instances.available/prometheus-config.lua
+    mode: 0644
+  notify: restart tarantool
+  tags:
+    - configure
+    - prometheus
+
+- name: remove default config
+  file:
+    path: /etc/tarantool/instances.enabled/prometheus-config.lua
+    state: absent
+  tags: configure
+
+- name: create symlinks
+  file:
+    src: /etc/tarantool/instances.available/{{ item.value.name }}.lua
+    dest: /etc/tarantool/instances.enabled/{{ item.value.name }}.lua
+    state: link
+  with_dict: "{{ environments }}"
+  notify: restart tarantool
+  tags: configure
+
+- name: create symlink for prometheus configuration
+  file:
+    src: /etc/tarantool/instances.available/prometheus-config.lua
+    dest: /etc/tarantool/instances.enabled/prometheus-config.lua
+    state: link
+  notify: restart tarantool
+  tags:
+    - configure
+    - prometheus

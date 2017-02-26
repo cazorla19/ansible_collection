@@ -1,0 +1,66 @@
+- name: create directory for prometheus services
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0777
+  with_items:
+    - "{{ prometheus_root }}"
+    - "{{ prometheus_logs }}"
+  tags: directory
+
+- name: get info about prometheus presence
+  stat:
+    path: "{{ prometheus_root }}/prometheus"
+  register: prometheus_dir
+  tags:
+   - install
+   - rename
+
+- name: get all service binaries to directory
+  unarchive:
+    src: "https://github.com/prometheus/{{ item.value.id }}/releases/download/v{{ item.value.version }}/{{ item.value.id }}-{{ item.value.version }}.linux-amd64.tar.gz"
+    dest: "{{ prometheus_root }}"
+    remote_src: yes
+  with_dict: "{{ services }}"
+  when: prometheus_dir.stat.exists ==  False
+  tags: install
+
+- name: rename directories if they we didn't find prometheus-server directory
+  command: "mv {{ item.value.directory }}-{{ item.value.version }}.linux-amd64 {{ item.value.directory }}"
+  with_dict: "{{ services }}"
+  when: prometheus_dir.stat.exists ==  False
+  tags:
+   - install
+   - rename
+
+- name: check prometheus installation [1/2]
+  command: "{{ prometheus_root }}/prometheus/prometheus --version"
+  register: prometheus_version
+  tags: check
+
+- name: check prometheus installation [2/2]
+  debug:
+    msg: "{{ prometheus_version.stdout }}"
+  tags: check
+
+- name: ensure we have systemd units on the server
+  template:
+    src: "{{ item.key }}.j2"
+    dest: "/lib/systemd/system/{{ item.key }}.service"
+  with_dict: "{{ services }}"
+  notify: restart prometheus
+  register: daemons
+  tags: service
+
+- name: reload systemd
+  command: systemctl daemon-reload
+  when: daemons.changed
+  tags: service
+
+- name: add services to startup and start them
+  service:
+    name: "{{ item.key }}"
+    enabled: yes
+    state: started
+  with_dict: "{{ services }}"
+  tags: service

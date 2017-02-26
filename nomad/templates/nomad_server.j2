@@ -1,0 +1,6 @@
+[Service]
+ExecStart=/bin/sh -c 'nomad agent -config {{ config_dir }}/server.hcl >> {{ log_dir }}/nomad.log 2>&1'
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

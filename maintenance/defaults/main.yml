@@ -1,0 +1,36 @@
+---
+
+users:
+  semaginea:
+    key: "{{ lookup('ini', 'semaginea section=ec2-users-keys file=secure.ini') }}"
+    group: developers
+  atishin:
+    key: "{{ lookup('ini', 'atishin section=ec2-users-keys file=secure.ini') }}"
+    group: developers
+  vmarunov:
+    key: "{{ lookup('ini', 'vmarunov section=ec2-users-keys file=secure.ini') }}"
+    group: developers
+  igafarov:
+    key: "{{ lookup('ini', 'igafarov section=ec2-users-keys file=secure.ini') }}"
+    group: developers
+  apuzhlyakov:
+    key: "{{ lookup('ini', 'apuzhlyakov section=ec2-users-keys file=secure.ini') }}"
+    group: developers
+  mpovolnova:
+    key: "{{ lookup('ini', 'mpovolnova section=ec2-users-keys file=secure.ini') }}"
+    group: developers
+  gkondratenko:
+    key: "{{ lookup('ini', 'gkondratenko section=ec2-users-keys file=secure.ini') }}"
+    group: developers
+  mchinkov:
+    key: "{{ lookup('ini', 'mchinkov section=ec2-users-keys file=secure.ini') }}"
+    group: operations
+  smonichev:
+    key: "{{ lookup('ini', 'smonichev section=ec2-users-keys file=secure.ini') }}"
+    group: developers
+
+memory_settings:
+  vm.swappiness:
+    current: 0
+  vm.overcommit_memory:
+    current: 1

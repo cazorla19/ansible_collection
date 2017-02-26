@@ -1,0 +1,4 @@
+- include: install.yml
+- include: auth.yml
+  when: nginx_auth is defined
+- include: configure.yml

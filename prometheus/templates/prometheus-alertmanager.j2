@@ -1,0 +1,13 @@
+[Unit]
+Description=Prometheus Alert Manager
+Documentation=https://prometheus.io/docs/introduction/overview/
+After=network-online.target
+
+[Service]
+User=root
+ExecStart=/bin/sh -c '{{ services['prometheus-alertmanager'].directory }}/alertmanager -config.file={{ services['prometheus-alertmanager'].config }} -web.external-url={{ hostname }}:8083 >> {{ services['prometheus-alertmanager'].log }} 2>&1'
+ExecReload=/usr/bin/curl -X POST http://localhost:9093/-/reload
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

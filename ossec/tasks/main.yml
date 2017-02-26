@@ -1,0 +1,21 @@
+- name: get gpg key [Debian/Ubuntu]
+  apt_key: url=https://ftp-master.debian.org/keys/archive-key-6.0.asc state=present
+  tags: 
+    - repo
+    - key
+
+- name: get ossec-server repo [Debian/Ubuntu]
+  apt_repository: repo='deb http://ossec.wazuh.com/repos/apt/ubuntu trusty main' state=present
+  tags: repo
+
+- name: update repo [Debian/Ubuntu]
+  apt: update_cache=yes
+  tags: 
+    - update
+    - repo
+
+- include: ossec_server.yml
+  when: inventory_hostname == 'example-ossec'
+
+- include: ossec_agent.yml
+  when: inventory_hostname != 'example-ossec'

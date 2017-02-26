@@ -1,0 +1,28 @@
+- name: ensure we have openssl
+  package: name=openssl state=present
+  tags: install
+
+- name: create directories for keys
+  file: dest=/etc/pki/tls/{{ item }} mode=755 state=directory
+  with_items:
+    - certs
+    - private
+  tags: ssl
+
+- name: replace ssl config for ip address acceptance
+  template: src=openssl.j2 dest={{ ssl_config }} force=yes
+  tags: ssl
+
+- name: generate key bundle for elk clients
+  command: "openssl req -config {{ ssl_config }} -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout private/logstash-forwarder.key -out certs/logstash-forwarder.crt"
+  args:
+    chdir: "/etc/pki/tls"
+    creates: "{{ item }}"
+  with_items:
+    - /etc/pki/tls/private/logstash-forwarder.key
+    - "{{ ssl_cert }}"
+  tags: key
+
+- name: fetch open ssl certificate to local machine
+  fetch: src={{ ssl_cert }} dest=/tmp/ flat=yes
+  tags: fetch

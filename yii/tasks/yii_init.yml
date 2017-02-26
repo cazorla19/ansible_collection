@@ -1,0 +1,37 @@
+- name: ensure every necessary package is installed
+  apt: name={{ item }} state=present
+  with_items:
+    - nginx
+    - mysql-client
+    - mysql-server
+    - libmysqlclient-dev
+    - python-mysqldb
+    - php5-fpm
+    - php5-mysql
+    - curl
+    - nodejs
+  tags: install
+
+- name: install composer locally
+  get_url: url=https://getcomposer.org/composer.phar dest={{ site_directory }}/composer.phar mode=0755 force=yes
+  tags: install, composer
+
+- name: install composer_asset_plugin
+  shell: "php composer.phar global require \"fxp/composer-asset-plugin:~{{ item }}\""
+  args:
+    chdir: "{{ site_directory }}"
+  with_items:
+    - "{{ composer_asset_plugin_version }}"
+  tags: install, composer
+
+- name: deploy yii framework
+  shell: "php composer.phar install"
+  args:
+    chdir: "{{ site_directory }}"
+  tags: install
+
+- name: initialize yii development environment
+  shell: "php init --env=Development --overwrite=All"
+  args:
+    chdir: "{{ site_directory }}"
+  tags: install

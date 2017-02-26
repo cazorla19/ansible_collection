@@ -1,0 +1,19 @@
+ - name: get Dropbox
+   get_url: url=http://www.dropbox.com/download/?plat=lnx.x86_64 dest=/home/{{ ansible_ssh_user }}/dropbox.tar.gz
+   tags: download
+
+ - name: unarchive Dropbox
+   unarchive: src=/home/{{ ansible_ssh_user }}/dropbox.tar.gz dest=/home/{{ ansible_ssh_user }}/ copy=no
+   tags: unarchive
+
+ - name: run setup script
+   shell: timeout 5s env - LANG="$LANG" /home/{{ ansible_ssh_user }}/.dropbox-dist/dropboxd | sed -ne 's/.*\(https[^"]*\).*/\1/p' | head -n 1
+   args:
+    chdir: /home/{{ ansible_ssh_user }}/
+    executable: /bin/bash
+   register: link
+   tags: install
+
+ - name: print the link
+   debug: msg={{ link.stdout }}
+   tags: link

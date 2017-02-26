@@ -1,0 +1,34 @@
+ - name: ensure we have necessary packages
+   package: name={{ item }} state=present
+   with_items:
+      - python-pip
+      - python-virtualenv
+      - python3-dev
+      - git
+   tags: 
+      - virtualenv
+      - pip
+      - git
+      - install
+
+ - name: make git pull
+   git: repo=git@gitlab.example.com:example/example-sys.git dest=/home/{{ ansible_ssh_user }}/example-sys update=yes key_file=/home/{{ ansible_ssh_user }}/.ssh/id_rsa accept_hostkey=True
+   tags: git
+
+ - name: check python virtualenv existence
+   stat: path=/home/{{ ansible_ssh_user }}/example-sys/monitoring/pyvenv.cfg
+   register: file_state
+   tags: virtualenv
+
+ - name: install Python defalut virtual environment for monitoring
+   pip: name=pip virtualenv=/home/{{ ansible_ssh_user }}/example-sys/monitoring virtualenv_command='virtualenv -p /usr/bin/python3'
+   when: file_state.stat.exists == False
+   tags: virtualenv
+
+ - name: push requirements.txt to remote virtualenv
+   template: src={{ templates_dir }}/{{ inventory_hostname }}/pip-requirements.j2 dest=/home/{{ ansible_ssh_user }}/example-sys/monitoring/requirements.txt
+   tags: pip
+
+ - name: upgrade python requirements
+   pip: requirements=/home/{{ ansible_ssh_user }}/example-sys/monitoring/requirements.txt virtualenv=/home/{{ ansible_ssh_user }}/example-sys/monitoring virtualenv_command='virtualenv -p /usr/bin/python3'
+   tags: pip

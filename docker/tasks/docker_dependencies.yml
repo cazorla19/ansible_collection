@@ -1,0 +1,34 @@
+ - name: update repo cache
+   apt: update_cache=yes
+   tags: repo
+
+ - name: install CA certificates support
+   apt: name={{ item }} state=present
+   with_items:
+    - apt-transport-https 
+    - ca-certificates
+    - apparmor
+   tags: ca
+
+ - name: add gpg key
+   apt_key: keyserver="hkp://p80.pool.sks-keyservers.net:80" id=58118E89F3A912897C070ADBF76221572C52609D
+   tags: ca
+
+ - name: add docker repo
+   apt_repository: repo='deb https://apt.dockerproject.org/repo ubuntu-trusty main' state=present
+   tags: repo
+
+ - name: update repo cache one more time
+   apt: update_cache=yes
+   tags: repo
+
+ - name: register kernel version
+   command: "uname -r"
+   register: kernel_version
+   tags: kernel
+
+  #works only on ansible>2.1
+  
+ - name: install extra drivers
+   apt: name=linux-image-extra-{{ kernel_version }} state=present allow_unauthenticated=yes
+   tags: kernel

@@ -1,0 +1,19 @@
+- name: set up go compilation directory
+  file: path={{ golang_source_dir }} state=directory owner={{ remote_user }} group={{ remote_group }} mode=0755 force=yes
+  tags: configure
+
+- name: download go
+  get_url: url=https://storage.googleapis.com/golang/go{{ golang_version }}.linux-amd64.tar.gz dest={{ golang_source_dir }}/go{{ golang_version }}.tar.gz
+  tags: source
+
+- name: unarchive go
+  unarchive: src={{ golang_source_dir }}/go{{ golang_version }}.tar.gz dest={{ golang_source_dir }} copy=no
+  tags: source
+
+- name: add golang symlinks
+  file: src=/usr/local/go/go/bin/{{ item }} dest=/usr/local/bin/{{ item }} state=link force=yes
+  with_items:
+    - go
+    - godoc
+    - gofmt
+  tags: configure

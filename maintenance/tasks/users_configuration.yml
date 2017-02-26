@@ -1,0 +1,23 @@
+- name: create nesessary groups
+  group:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - developers
+    - operations
+  tags: groupadd
+
+- name: append users
+  user:
+    name: "{{ item.key }}"
+    group: "{{ item.value.group }}"
+  with_dict: "{{ users }}"
+  tags: useradd
+
+- name: append ssh keys for users
+  authorized_key:
+    user: "{{ item.key }}"
+    key: "{{ item.value.key }}"
+    state: present
+  with_dict: "{{ users }}"
+  tags: key

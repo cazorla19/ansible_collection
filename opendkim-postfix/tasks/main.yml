@@ -1,0 +1,39 @@
+ - name: install opendkim and postfix
+   yum: name={{ item }} state=present
+   with_items:
+     - opendkim
+     - postfix
+   tags: install
+
+ - name: flush main opendkim config
+   template: src=opendkim.j2 dest=/etc/opendkim.conf
+   tags: configure
+
+ - name: flush other opendkim configs
+   template: src={{ item }}.j2 dest=/etc/opendkim/{{ item }}
+   with_items:
+     - KeyTable
+     - SigningTable
+     - TrustedHosts
+   notify: restart opendkim
+   tags: configure
+
+ - name: append milter info to postfix config
+   blockinfile:
+     dest: /etc/postfix/main.cf
+     insertafter: EOF
+     block: |
+       smtpd_milters = inet:127.0.0.1:8891
+       non_smtpd_milters = $smtpd_milters
+       milter_default_action = accept
+   notify: restart postfix
+   tags: configure
+
+ - name: generate default keys
+   command: opendkim-default-keygen
+   notify: restart opendkim
+   tags: keygen
+
+ - name: get DKIM DNS record
+   fetch: src=/etc/opendkim/keys/default.txt dest=/tmp/default.txt
+   tags: keygen

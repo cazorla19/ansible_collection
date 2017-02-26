@@ -1,0 +1,3 @@
+- include: yii_init.yml
+- include: yii_mysql.yml
+- include: yii_nginx.yml

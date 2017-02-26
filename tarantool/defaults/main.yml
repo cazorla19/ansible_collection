@@ -1,0 +1,23 @@
+---
+
+tarantool_version: 1.7
+
+environments:
+  portfolio_production:
+    name: tarantool-prod
+    user: "{{ lookup('ini', 'user section=tarantool-production file=secure.ini') }}"
+    password: "{{ lookup('ini', 'password section=tarantool-production file=secure.ini') }}"
+    port: 3301
+    console_port: 3311
+  portfolio_sit:
+    name: tarantool-sit
+    user: "{{ lookup('ini', 'user section=tarantool-sit file=secure.ini') }}"
+    password: "{{ lookup('ini', 'password section=tarantool-sit file=secure.ini') }}"
+    port: 3302
+    console_port: 3312
+  portfolio_dev:
+    name: tarantool-dev
+    user: "{{ lookup('ini', 'user section=tarantool-dev file=secure.ini') }}"
+    password: "{{ lookup('ini', 'password section=tarantool-dev file=secure.ini') }}"
+    port: 3303
+    console_port: 3313

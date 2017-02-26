@@ -1,0 +1,6 @@
+[Service]
+ExecStart=/bin/sh -c '/usr/bin/consul agent -server -bootstrap-expect 1 -data-dir {{ data_dir }} -config-dir {{ config_dir }} -dc={{ agent_dc }} -ui-dir {{ dashboard_dir }} -atlas-join -atlas={{ atlas_user }}/infrastructure -atlas-token="{{ atlas_token }}" >> {{ log_dir }}/consul.log 2>&1'
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

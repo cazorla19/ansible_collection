@@ -1,0 +1,18 @@
+- name: place log directories
+  file: path={{ site_directory }}/{{ item }}/web/log owner={{ remote_user }} group={{ remote_group }} mode=0755 force=yes
+  with_items:
+    - frontend
+    - backend
+  tags: configure
+
+- name: remove default nginx vhost
+  file: path=/etc/nginx/sites-{{ item }}/default state=absent
+  with_items:
+     - enabled
+     - available
+  tags: configure
+
+- name: move nginx config
+  template: src={{ nginx_vhost }}.j2 dest=/etc/nginx/sites-enabled/{{ nginx_vhost }} force=yes owner={{ remote_user }} group={{ remote_group }} mode=0755
+  notify: restart nginx
+  tags: configure

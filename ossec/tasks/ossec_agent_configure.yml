@@ -1,0 +1,13 @@
+ - name: place default ossec-agent config
+   template: src=ossec.j2 dest=/var/ossec/etc/ossec.conf
+   notify: restart ossec
+   tags: configure
+
+ - name: go through remote authentication with ossec-server
+   shell: '/var/ossec/bin/agent-auth -m ossec.example.com -p 1515 -A {{ hostname }}'
+   notify: restart ossec
+   tags: authentication
+
+ - name: start ossec-agent
+   service: name=ossec state=started
+   tags: service

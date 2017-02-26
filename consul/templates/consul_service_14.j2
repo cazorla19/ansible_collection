@@ -1,0 +1,8 @@
+description "Consul agent"
+
+start on (local-filesystems and net-device-up IFACE=eth0)
+stop on runlevel [!12345]
+
+respawn
+
+exec consul agent -data-dir {{ data_dir }} -config-dir {{ config_dir }} -dc={{ agent_dc }} -atlas-join -atlas={{ atlas_user }}/infrastructure -atlas-token="{{ atlas_token }}" >> {{ log_dir }}/consul.log 2>&1

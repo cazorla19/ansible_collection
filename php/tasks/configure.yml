@@ -1,0 +1,31 @@
+- name: make site directory
+  file:
+    path: "{{ site_directory }}"
+    owner: "{{ remote_user }}"
+    group: "{{ remote_group }}"
+    mode: 0755
+    state: directory
+  tags: configure
+
+- name: check phpinfo in site directory
+  copy:
+    src: info.php
+    dest: "{{ site_directory }}/index.php"
+    owner: "{{ remote_user }}"
+    group: "{{ remote_group }}"
+    mode: 0755
+  notify: restart php
+  tags: test
+
+- name: Disable default pool
+  file:
+    path: /etc/php/7.0/fpm/pool.d/www.conf
+    state: absent
+  notify: restart php
+
+- name: configure php-fpm
+  template:
+    src: wordpress.conf
+    dest: /etc/php/7.0/fpm/pool.d/
+  tags: configure
+  notify: restart php

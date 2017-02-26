@@ -1,0 +1,37 @@
+- name: ensure we have unzip installed
+  package: name=unzip state=present
+  tags: dependencies
+
+- name: download consul
+  get_url: url=https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_linux_amd64.zip dest=/tmp/consul_{{ consul_version }}.zip
+  tags: download
+
+- name: setup consul
+  unarchive: src=/tmp/consul_{{ consul_version }}.zip dest=/usr/bin copy=no
+  tags: install
+
+- name: make directory for consul logs and configs
+  file: path={{ item }} state=directory mode=0755
+  with_items:
+    - '{{ log_dir }}'
+    - '{{ config_dir }}'
+    - '{{ data_dir }}'
+  tags: configure
+
+- include: consul_server.yml
+  when: inventory_hostname == '{{ consul_server }}'
+
+- include: consul_agent.yml
+  when: inventory_hostname != '{{ consul_server }}'
+
+- name: update handler
+  copy: src={{ consul_local_configs }}/handlers/{{ inventory_hostname }}.sh dest=/opt/consul_handler.sh mode=0755
+  tags:
+    - discovery
+    - handler
+
+- name: append logrotate script
+  copy: src=consul-logrotate dest=/etc/logrotate.d/consul
+  tags: logrotate
+
+- include: consul_cleanup.yml

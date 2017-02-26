@@ -1,0 +1,22 @@
+ - name: ensure we have htpasswd utility
+   apt:
+     name: "{{ item }}"
+     state: present
+   with_items:
+    - apache2-utils
+    - python-passlib
+   tags:
+    - htpasswd
+    - install
+
+ - name: create user for nginx authentication
+   htpasswd:
+     path: "{{ nginx_auth_file }}"
+     name: "{{ nginx_auth_user }}"
+     password: "{{ nginx_auth_password }}"
+     owner: root
+     group: www-data
+     mode: 0640
+   tags:
+    - htpasswd
+    - user

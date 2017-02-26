@@ -1,0 +1,12 @@
+- name: install basic nginx
+  package:
+    name: nginx
+    state: present
+  tags: install
+
+- name: enable and start nginx
+  service:
+    name: nginx
+    enabled: yes
+    state: started
+  tags: service

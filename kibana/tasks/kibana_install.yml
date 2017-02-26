@@ -1,0 +1,27 @@
+- name: get kibana repo [CentOS/RHEL]
+  copy: src=kibana.repo dest=/etc/yum.repos.d/kibana.repo force=yes
+  when: ansible_distribution == "CentOS" or ansible_distribution == "Red Hat Enterprise Linux"
+  tags: repo
+
+- name: get kibana repo [Debian/Ubuntu]
+  apt_repository: repo='deb http://packages.elastic.co/kibana/{{ kibana_version }}/debian stable main' state=present
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
+  tags: repo
+
+- name: update repo [Debian/Ubuntu]
+  apt: update_cache=yes
+  tags: update
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: install kibana
+  package: name=kibana state=present allow_unauthenticated=yes
+  tags: install
+
+- name: configure kibana
+  lineinfile: "dest=/opt/kibana/config/kibana.yml regexp='^server.host:' line='server.host: \"localhost\"'"
+  notify: start kibana
+  tags: configure
+
+- name: enable and start kibana
+  service: name=kibana enabled=yes state=started
+  tags: configure

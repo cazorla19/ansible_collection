@@ -1,0 +1,8 @@
+- name: install ossec-server
+  package: name=ossec-hids state=present
+  tags: install
+
+- name: place ossec-server config
+  template: src=ossec-server.j2 dest=/var/ossec/etc/ossec.conf
+  notify: restart ossec
+  tags: configure

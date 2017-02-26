@@ -1,0 +1,47 @@
+- name: ensure nginx is installed
+  include_role:
+    name: nginx
+  tags: nginx
+
+- name: ensure we have python apt module
+  apt:
+    name: python-apt
+    state: present
+  tags: dependencies
+
+- name: add Grafana repository
+  apt_repository:
+    repo: deb https://packagecloud.io/grafana/stable/debian/ jessie main
+    state: present
+  tags: repo
+
+- name: add key for repo
+  apt_key:
+    url: "https://packagecloud.io/gpg.key"
+    state: present
+  tags: repo
+
+- name: update repository cache
+  apt:
+    update_cache: yes
+  tags: update
+
+- name: install Grafana
+  apt:
+    name: grafana
+    state: present
+  tags: install
+
+- name: start Grafana
+  service:
+    name: grafana-server
+    enabled: yes
+    state: started
+  tags: service
+
+  # TO DO: rewrite to built-in apt-mark
+  # when it will be ready in new version
+
+- name: keep grafana from accidental updates
+  command: "apt-mark hold grafana"
+  tags: mark

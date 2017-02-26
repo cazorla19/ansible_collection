@@ -1,0 +1,30 @@
+- name: add apt key for postgresql repo
+  apt_key:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    state: present
+  tags:
+   - repo
+
+- name: add postgresql repository
+  apt_repository:
+    repo: 'deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main'
+    state: present
+  tags:
+   - repo
+
+- name: update cache after repo addition
+  apt:
+    update_cache: yes
+  tags:
+   - repo
+
+- name: install postgresql
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "postgresql-{{ pg_version }}"
+    - libpq-dev
+    - python-psycopg2
+  tags:
+    - install

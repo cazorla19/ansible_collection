@@ -1,0 +1,7 @@
+- name: add nomad to startup
+  service: name=nomad-agent enabled=yes
+  tags: startup
+  
+- name: start nomad agent
+  service: name=nomad-agent state=stopped
+  tags: service

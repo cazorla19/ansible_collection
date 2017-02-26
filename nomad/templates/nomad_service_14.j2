@@ -1,0 +1,8 @@
+description "Consul agent"
+
+start on (local-filesystems and net-device-up IFACE=eth0)
+stop on runlevel [!12345]
+
+respawn
+
+exec nomad agent -config {{ config_dir }}/agent.hcl >> {{ log_dir }}/nomad.log 2>&1

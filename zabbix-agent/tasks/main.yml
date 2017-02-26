@@ -1,0 +1,4 @@
+- include: custom_monitoring_agent.yml
+  when: custom_monitoring_enabled is defined
+
+- include: zabbix_agent.yml

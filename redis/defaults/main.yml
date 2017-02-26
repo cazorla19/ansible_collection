@@ -1,0 +1,29 @@
+---
+
+environments:
+  user-production:
+    name: redis-user-prod
+    password: "{{ lookup('ini', 'user-production section=redis file=secure.ini') }}"
+    port: 6379
+  user-sit:
+    name: redis-user-sit
+    password: "{{ lookup('ini', 'user-sit section=redis file=secure.ini') }}"
+    port: 6380
+  user-dev:
+    name: redis-user-dev
+    password: "{{ lookup('ini', 'user-dev section=redis file=secure.ini') }}"
+    port: 6381
+  market-production:
+    name: redis-market-prod
+    password: "{{ lookup('ini', 'market-production section=redis file=secure.ini') }}"
+    port: 7379
+  market-sit:
+    name: redis-market-sit
+    password: "{{ lookup('ini', 'market-sit section=redis file=secure.ini') }}"
+    port: 7380
+  market-dev:
+    name: redis-market-dev
+    password: "{{ lookup('ini', 'market-dev section=redis file=secure.ini') }}"
+    port: 7381
+
+exporter_version: 0.10.5

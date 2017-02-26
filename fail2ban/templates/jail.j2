@@ -1,0 +1,33 @@
+[DEFAULT]
+
+ignoreip = 172.31.0.0/16 80.95.36.8 80.95.36.4
+bantime  = 86400
+findtime = 86400
+maxretry = 3
+backend = auto
+usedns = warn
+destemail = {{ smtp_user }}
+sendername = {{ smtp_user }}
+
+banaction = iptables-multiport
+mta = mail
+protocol = tcp
+chain = INPUT
+action_ = %(banaction)s[name=%(__name__)s, port="%(port)s", protocol="%(protocol)s", chain="%(chain)s"]
+action_mw = %(banaction)s[name=%(__name__)s, port="%(port)s", protocol="%(protocol)s", chain="%(chain)s"]
+              %(mta)s-whois[name=%(__name__)s, dest="%(destemail)s", protocol="%(protocol)s", chain="%(chain)s", sendername="%(sendername)s"]
+action_mwl = %(banaction)s[name=%(__name__)s, port="%(port)s", protocol="%(protocol)s", chain="%(chain)s"]
+               %(mta)s-whois-lines[name=%(__name__)s, dest="%(destemail)s", logpath=%(logpath)s, chain="%(chain)s", sendername="%(sendername)s"]
+action = %(action_mw)s
+
+#
+# JAILS
+#
+
+[ssh]
+
+enabled  = true
+port     = {{ ssh_port }}
+filter   = sshd
+logpath  = /var/log/auth.log
+maxretry = 5

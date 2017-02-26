@@ -1,0 +1,15 @@
+---
+
+## indices in environments
+## dev: combines_217df987d12c4d19b09a92a98a39b4b6
+## sit: combines_422fcd530fa448b2bd688a20797507b5
+## prod:
+##   combines_ca50410b3f294465925e8072875bf620
+##   combines_150c3a4233024655be66ff59b1420ca6
+##   combines_9f69eeb5a062489198155fa748f5cd67
+##   combines_8a59e5460cde45628468353f7fe2d045 (the biggest one)
+##   combines_74347239536642028e6532efb16062a6
+
+es_major_version: 5
+es_minor_version: 5.2.0.0
+java_major_version: 8

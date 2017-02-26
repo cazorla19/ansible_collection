@@ -1,0 +1,24 @@
+- name: get gpg key
+  apt_key:
+    url: "https://artifacts.elastic.co/GPG-KEY-elasticsearch"
+    state: present
+  tags:
+    - repo
+    - key
+
+- name: get filebeat repo
+  apt_repository:
+    repo: 'deb https://artifacts.elastic.co/packages/5.x/apt stable main'
+    state: present
+  tags: repo
+
+- name: update repo
+  apt:
+    update_cache: yes
+  tags: update
+
+- name: install filebeat
+  package:
+    name: filebeat
+    state: present
+  tags: install

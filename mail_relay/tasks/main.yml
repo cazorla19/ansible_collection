@@ -1,0 +1,30 @@
+ - name: install necessary mail-supported packages
+   package: name={{ item }} state=present
+   with_items:
+    - ssmtp
+    - mailutils
+   tags:
+    - mail 
+    - install
+
+ - name: configure ssmtp
+   template: src=ssmtp.j2 dest=/etc/ssmtp/ssmtp.conf
+   tags:
+    - mail 
+    - configure
+
+ - name: install postfix
+   package: name=postfix state=present
+   tags:
+    - mail
+    - install
+
+ - name: send test mail to desired address
+   mail:
+    host='localhost'
+    port=25
+    to="<{{ target_email }}>"
+    subject='{{ ansible_hostname }}: Ansible-report'
+    body='System {{ ansible_hostname }} has been successfully provisioned.'
+   tags:
+    - test

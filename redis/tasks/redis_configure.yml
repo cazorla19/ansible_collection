@@ -1,0 +1,15 @@
+ - name: stop redis at first
+   service: name=redis-server state=stopped
+   tags: configure
+
+ - name: copy launch script to instance
+   file: src=redis-start.sh dest=/home/{{ ansible_ssh_user }}/redis-start.sh force=yes mode=0755
+   tags: configure
+
+ - name: run launch script
+   command: "/home/{{ ansible_ssh_user }}/redis-start.sh"
+   tags: configure
+
+ - name: add launch script to startup
+   cron: name="run 3 redis instances" special_time=reboot job="/home/{{ ansible_ssh_user }}/redis-start.sh"
+   tags: configure

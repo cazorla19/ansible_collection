@@ -1,0 +1,41 @@
+- name: update cache
+  apt:
+    update_cache: yes
+  tags: update
+
+- name: install redis
+  apt:
+    name: redis-server
+    state: present
+  tags: install
+
+- name: configure names for different environments
+  copy:
+    src: "{{ item.value.name }}.service"
+    dest: "/lib/systemd/system/{{ item.value.name }}.service"
+  with_dict: "{{ environments }}"
+  notify:
+    - reload systemd
+    - restart redis
+  tags: daemons
+
+- name: flush redis configuration
+  template:
+    src: "{{ item.value.name }}.conf.j2"
+    dest: "/etc/redis/{{ item.value.name }}.conf"
+    owner: redis
+    group: redis
+  with_dict: "{{ environments }}"
+  notify: restart redis
+  tags: configure
+
+- name: ensure all systems go
+  service:
+    name: "{{ item.value.name }}"
+    state: started
+  with_dict: "{{ environments }}"
+  tags: service
+
+- name: setup monitoring
+  include: monitoring.yml
+  tags: monitoring

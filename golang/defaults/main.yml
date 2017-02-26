@@ -1,0 +1,6 @@
+---
+
+remote_user: git
+remote_group: git
+golang_source_dir: /usr/local
+golang_version: 1.5.3

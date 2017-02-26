@@ -1,0 +1,37 @@
+- name: get gpg key
+  apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+  tags: repo
+
+- name: get elasticsearch repo
+  apt_repository:
+    repo: 'deb https://artifacts.elastic.co/packages/{{ es_major_version }}.x/apt stable main'
+    state: present
+  tags: repo
+
+- name: update repo
+  apt:
+    update_cache: yes
+  tags: update
+
+- name: install elasticsearch
+  package:
+    name: elasticsearch
+    state: present
+    allow_unauthenticated: yes
+  tags: install
+
+- name: enable and start elasticsearch
+  service:
+    name: elasticsearch
+    enabled: yes
+    state: started
+  tags: configure
+
+  # TO DO: rewrite to built-in apt-mark
+  # when it will be ready in new version
+
+- name: keep elasticsearch from accidental updates
+  command: "apt-mark hold elasticsearch"
+  tags: mark

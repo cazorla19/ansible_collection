@@ -1,0 +1,324 @@
+global:
+  resolve_timeout: 1d
+
+  slack_api_url: "https://hooks.slack.com/services/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"
+
+  # The smarthost and SMTP sender used for mail notifications.
+  smtp_smarthost: 'localhost:25'
+  smtp_from: 'alertmanager@example.org'
+  smtp_auth_username: 'alertmanager'
+  smtp_auth_password: 'password'
+
+# The directory from which notification templates are read.
+templates:
+- '/opt/prometheus/alertmanager/template/*.tmpl'
+
+# The root route on which each incoming alert enters.
+route:
+  # The labels by which incoming alerts are grouped together. For example,
+  # multiple alerts coming in for cluster=A and alertname=LatencyHigh would
+  # be batched into a single group.
+  group_by: ['instance', 'job']
+
+  # When a new group of alerts is created by an incoming alert, wait at
+  # least 'group_wait' to send the initial notification.
+  # This way ensures that you get multiple alerts for the same group that start
+  # firing shortly after another are batched together on the first
+  # notification.
+  group_wait: 15s
+
+  # When the first notification was sent, wait 'group_interval' to send a batch
+  # of new alerts that started firing for that group.
+  group_interval: 5m
+
+  # If an alert has successfully been sent, wait 'repeat_interval' to
+  # resend them.
+  repeat_interval: 12h
+
+  # A default receiver
+  receiver: prometheus-test
+  # All the above attributes are inherited by all child routes and can
+  # overwritten on each.
+
+  # The child route trees.
+  routes:
+  - match_re:
+      job: '^(service_metrics|blackbox.*)$'
+    receiver: alerts-infra
+    routes:
+    - match_re:
+        instance: '.*dev.*'
+      receiver: alerts-dev
+    - match_re:
+        instance: '^(sd-b0|sit-b0)$'
+      receiver: alerts-sit
+    - match_re:
+        instance: '.*prod.*'
+      receiver: alerts-production
+    - match_re:
+        instance: '.*proto.*'
+      receiver: alerts-proto
+
+  - match:
+      job: nginx
+    receiver: alerts-frontend
+
+  - match_re:
+      job: '^(tarantool|postgres|redis|es)_exporter.*$'
+    receiver: alerts-db
+    routes:
+    - match_re:
+        job: tarantool_exporter
+      receiver: alerts-accounting
+    - match_re:
+        job: es_exporter
+      receiver: alerts-search
+    - match_re:
+        job: redis_exporter
+      receiver: alerts-data-api
+    - match_re:
+        job: postgres_exporter
+      receiver: alerts-data-api
+    - match_re:
+        severity: '^(warning|critical)$'
+      receiver: alerts-infra
+
+  - match_re:
+      alertname: '^(Docker|Container).*$'
+    receiver: alerts-docker
+    routes:
+    - match_re:
+        instance: '.*dev.*'
+      receiver: alerts-dev
+    - match_re:
+        instance: '^(sd-b0|sit-b0)$'
+      receiver: alerts-sit
+    - match_re:
+        instance: '.*prod.*'
+      receiver: alerts-production
+    - match_re:
+        instance: '.*proto.*'
+      receiver: alerts-proto
+    - match_re:
+        severity: '^(warning|critical)$'
+      receiver: alerts-infra
+
+  - match_re:
+      service: '.*goldeneye'
+    receiver: alerts-search
+
+  - match_re:
+      service: '.*portfolio.*'
+    receiver: alerts-accounting
+
+  - match_re:
+      service: '.*ui.*'
+    receiver: alerts-frontend
+
+  - match_re:
+      service: '.*api.*'
+    receiver: alerts-data-api
+
+  - match_re:
+      service: '^.*(mobile|ios|android|imessenger).*$'
+    receiver: alerts-mobile
+
+# CHECK AWS ALERTS IN GRAFANA!
+
+# Inhibition rules allow to mute a set of alerts given that another alert is
+# firing.
+# We use this to mute any warning-level notifications if the same alert is
+# already critical.
+inhibit_rules:
+- source_match:
+    severity: 'critical'
+  target_match_re:
+    severity: '^(info|warning)$'
+  # Apply inhibition if the alertname is the same.
+  equal: ['alertname', 'instance']
+
+receivers:
+
+## Critical alerting with PagerDuty coming soon!
+
+- name: 'prometheus-test'
+  slack_configs:
+  - channel: prometheus-test
+    icon_emoji: ":information_source:"
+    pretext: "{{ .CommonLabels.severity | toUpper }}! {{ .CommonAnnotations.summary }}"
+    title: "Summary: {{ .CommonAnnotations.summary }}"
+    text: "Description: {{ .CommonAnnotations.description }}\nGraph: {{ .CommonAnnotations.graph }}"
+    send_resolved: True
+
+- name: 'alerts-mobile'
+  slack_configs:
+  - channel: alerts-mobile
+    icon_emoji: ":information_source:"
+    pretext: "{{ .CommonLabels.severity | toUpper }}! {{ .CommonAnnotations.summary }}"
+    title: "Summary: {{ .CommonAnnotations.summary }}"
+    text: "Description: {{ .CommonAnnotations.description }}\nGraph: {{ .CommonAnnotations.graph }}"
+    send_resolved: True
+
+- name: 'alerts-frontend'
+  slack_configs:
+  - channel: alerts-frontend
+    icon_emoji: ":information_source:"
+    pretext: "{{ .CommonLabels.severity | toUpper }}! {{ .CommonAnnotations.summary }}"
+    title: "Summary: {{ .CommonAnnotations.summary }}"
+    text: "Description: {{ .CommonAnnotations.description }}\nGraph: {{ .CommonAnnotations.graph }}"
+    send_resolved: True
+
+- name: 'alerts-accounting'
+  slack_configs:
+  - channel: alerts-accounting
+    icon_emoji: ":information_source:"
+    pretext: "{{ .CommonLabels.severity | toUpper }}! {{ .CommonAnnotations.summary }}"
+    title: "Summary: {{ .CommonAnnotations.summary }}"
+    text: "Description: {{ .CommonAnnotations.description }}\nGraph: {{ .CommonAnnotations.graph }}"
+    send_resolved: True
+
+- name: 'alerts-search'
+  slack_configs:
+  - channel: alerts-search
+    icon_emoji: ":information_source:"
+    pretext: "{{ .CommonLabels.severity | toUpper }}! {{ .CommonAnnotations.summary }}"
+    title: "Summary: {{ .CommonAnnotations.summary }}"
+    text: "Description: {{ .CommonAnnotations.description }}\nGraph: {{ .CommonAnnotations.graph }}"
+    send_resolved: True
+
+- name: 'alerts-data-api'
+  slack_configs:
+  - channel: alerts-data-api
+    icon_emoji: ":information_source:"
+    pretext: "{{ .CommonLabels.severity | toUpper }}! {{ .CommonAnnotations.summary }}"
+    title: "Summary: {{ .CommonAnnotations.summary }}"
+    text: "Description: {{ .CommonAnnotations.description }}\nGraph: {{ .CommonAnnotations.graph }}"
+    send_resolved: True
+
+- name: 'alerts-db'
+  slack_configs:
+  - channel: alerts-db
+    icon_emoji: ":information_source:"
+    pretext: "{{ .CommonLabels.severity | toUpper }}! {{ .CommonAnnotations.summary }}"
+    title: "Summary: {{ .CommonAnnotations.summary }}"
+    text: "Description: {{ .CommonAnnotations.description }}\nGraph: {{ .CommonAnnotations.graph }}"
+    send_resolved: True
+
+- name: 'alerts-docker'
+  slack_configs:
+  - channel: alerts-docker
+    icon_emoji: ":information_source:"
+    pretext: "{{ .CommonLabels.severity | toUpper }}! {{ .CommonAnnotations.summary }}"
+    title: "Summary: {{ .CommonAnnotations.summary }}"
+    text: "Description: {{ .CommonAnnotations.description }}\nGraph: {{ .CommonAnnotations.graph }}"
+    send_resolved: True
+
+- name: 'alerts-aws'
+  slack_configs:
+  - channel: alerts-aws
+    icon_emoji: ":information_source:"
+    pretext: "{{ .CommonLabels.severity | toUpper }}! {{ .CommonAnnotations.summary }}"
+    title: "Summary: {{ .CommonAnnotations.summary }}"
+    text: "Description: {{ .CommonAnnotations.description }}\nGraph: {{ .CommonAnnotations.graph }}"
+    send_resolved: True
+
+- name: 'alerts-dev'
+  slack_configs:
+  - channel: alerts-dev
+    icon_emoji: ":information_source:"
+    pretext: "{{ .CommonLabels.severity | toUpper }}! {{ .CommonAnnotations.summary }}"
+    title: "Summary: {{ .CommonAnnotations.summary }}"
+    text: "Description: {{ .CommonAnnotations.description }}\nGraph: {{ .CommonAnnotations.graph }}"
+    send_resolved: True
+
+- name: 'alerts-sit'
+  slack_configs:
+  - channel: alerts-sit
+    icon_emoji: ":information_source:"
+    pretext: "{{ .CommonLabels.severity | toUpper }}! {{ .CommonAnnotations.summary }}"
+    title: "Summary: {{ .CommonAnnotations.summary }}"
+    text: "Description: {{ .CommonAnnotations.description }}\nGraph: {{ .CommonAnnotations.graph }}"
+    send_resolved: True
+
+- name: 'alerts-production'
+  slack_configs:
+  - channel: alerts-production
+    icon_emoji: ":information_source:"
+    pretext: "{{ .CommonLabels.severity | toUpper }}! {{ .CommonAnnotations.summary }}"
+    title: "Summary: {{ .CommonAnnotations.summary }}"
+    text: "Description: {{ .CommonAnnotations.description }}\nGraph: {{ .CommonAnnotations.graph }}"
+    send_resolved: True
+
+- name: 'alerts-proto'
+  slack_configs:
+  - channel: alerts-proto
+    icon_emoji: ":information_source:"
+    pretext: "{{ .CommonLabels.severity | toUpper }}! {{ .CommonAnnotations.summary }}"
+    title: "Summary: {{ .CommonAnnotations.summary }}"
+    text: "Description: {{ .CommonAnnotations.description }}\nGraph: {{ .CommonAnnotations.graph }}"
+    send_resolved: True
+
+- name: 'alerts-infra'
+  slack_configs:
+  - channel: alerts-infra
+    icon_emoji: ":information_source:"
+    pretext: "{{ .CommonLabels.severity | toUpper }}! {{ .CommonAnnotations.summary }}"
+    title: "Summary: {{ .CommonAnnotations.summary }}"
+    text: "Description: {{ .CommonAnnotations.description }}\nGraph: {{ .CommonAnnotations.graph }}"
+    send_resolved: True
+
+# Left for the future
+
+#- name: 'infra-general'
+#  slack_configs:
+#  - channel: infrastructure_tasks
+#    icon_emoji: ":warning:"
+#    pretext: "{{ .CommonLabels.severity | toUpper }}! {{ .CommonAnnotations.summary }}"
+#    title: "Summary: {{ .CommonAnnotations.summary }}"
+#    text: "Description: {{ .CommonAnnotations.description }}\nGraph: {{ .CommonAnnotations.graph }}"
+#    send_resolved: True
+#
+#- name: 'mobile-general'
+#  slack_configs:
+#  - channel: mobile-app
+#    icon_emoji: ":warning:"
+#    pretext: "{{ .CommonLabels.severity | toUpper }}! {{ .CommonAnnotations.summary }}"
+#    title: "Summary: {{ .CommonAnnotations.summary }}"
+#    text: "Description: {{ .CommonAnnotations.description }}\nGraph: {{ .CommonAnnotations.graph }}"
+#    send_resolved: True
+#
+#- name: 'frontend-general'
+#  slack_configs:
+#  - channel: frontend
+#    icon_emoji: ":warning:"
+#    pretext: "{{ .CommonLabels.severity | toUpper }}! {{ .CommonAnnotations.summary }}"
+#    title: "Summary: {{ .CommonAnnotations.summary }}"
+#    text: "Description: {{ .CommonAnnotations.description }}\nGraph: {{ .CommonAnnotations.graph }}"
+#    send_resolved: True
+#
+#- name: 'accounting-general'
+#  slack_configs:
+#  - channel: accounting
+#    icon_emoji: ":warning:"
+#    pretext: "{{ .CommonLabels.severity | toUpper }}! {{ .CommonAnnotations.summary }}"
+#    title: "Summary: {{ .CommonAnnotations.summary }}"
+#    text: "Description: {{ .CommonAnnotations.description }}\nGraph: {{ .CommonAnnotations.graph }}"
+#    send_resolved: True
+#
+#- name: 'search-general'
+#  slack_configs:
+#  - channel: search
+#    icon_emoji: ":warning:"
+#    pretext: "{{ .CommonLabels.severity | toUpper }}! {{ .CommonAnnotations.summary }}"
+#    title: "Summary: {{ .CommonAnnotations.summary }}"
+#    text: "Description: {{ .CommonAnnotations.description }}\nGraph: {{ .CommonAnnotations.graph }}"
+#    send_resolved: True
+#
+#- name: 'data-api-general'
+#  slack_configs:
+#  - channel: data-api
+#    icon_emoji: ":warning:"
+#    pretext: "{{ .CommonLabels.severity | toUpper }}! {{ .CommonAnnotations.summary }}"
+#    title: "Summary: {{ .CommonAnnotations.summary }}"
+#    text: "Description: {{ .CommonAnnotations.description }}\nGraph: {{ .CommonAnnotations.graph }}"
+#    send_resolved: True

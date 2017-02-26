@@ -1,0 +1,38 @@
+ - name: create website directory
+   file: path={{ site_directory }} state=directory mode=0755
+   tags: configure
+
+ - name: ensure every package is installed
+   apt: package={{ item }} state=installed
+   with_items:
+     - apache2
+     - libapache2-mod-php5
+     - php5
+     - php5-fpm
+     - php-apc 
+     - php5-intl
+     - imagemagick
+     - php5-cli
+   tags: install
+
+ - name: get a new MediaWiki version
+   unarchive: src=https://releases.wikimedia.org/mediawiki/{{ wiki_major_ver }}/mediawiki-{{ wiki_major_ver }}.{{ wiki_minor_ver }}.tar.gz dest={{ site_directory }} copy=no
+   tags: install
+
+ - name: remove index.html if exists
+   file: path={{ site_directory }}/index.html state=absent
+   tags: configure
+
+ - name: move packed wiki directory
+   command: mv {{ site_directory }}/mediawiki-{{ wiki_major_ver }}.{{ wiki_minor_ver }}/* {{ site_directory }}/
+   tags: configure
+
+ - name: remove empty unarchived directory
+   file: path={{ site_directory }}/mediawiki-{{ wiki_major_ver }}.{{ wiki_minor_ver }} state=absent
+   tags: configure
+
+ - name: check 80 port sends 200 OK
+   uri: url=http://{{ site_domain_name }} status_code=200,201,301,304
+   tags: check
+
+# - name: move LocalSettings.php

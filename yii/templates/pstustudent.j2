@@ -1,0 +1,79 @@
+server {
+       charset utf-8;
+       client_max_body_size 128M;
+       set $project_root {{ site_directory }}/frontend/web;
+
+       listen 80; ## listen for ipv4
+
+       server_name {{ domain_name }};
+       root        $project_root;
+       index index.php;
+
+       access_log   {{ site_directory }}/frontend/web/log/frontend-access.log;
+       error_log    {{ site_directory }}/frontend/web/log/frontend-error.log;
+
+       location / {
+           # Redirect everything that isn't a real file to index.php
+           try_files $uri $uri/ /index.php?$args;
+	}
+
+       #uncomment to avoid processing of calls to non-existing static files by Yii
+       location ~ \.(js|css|png|jpg|gif|swf|ico|pdf|mov|fla|zip|rar)$ {
+           try_files $uri =404;
+       }
+       error_page 404 /404.html;
+
+       location ~ \.php$ {
+           include fastcgi_params;
+           fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
+           #fastcgi_pass   127.0.0.1:9000;
+           fastcgi_pass unix:/var/run/php5-fpm.sock;
+           try_files $uri =404;
+       }
+
+       location ~ /\.(ht|svn|git) {
+           deny all;
+       }
+   }
+
+   server {
+       charset utf-8;
+       client_max_body_size 128M;
+       set $project_root {{ site_directory }}/backend/web;
+
+       listen 80; # listen for ipv4
+
+       server_name backend.{{ domain_name }};
+       root        $project_root;
+       index index.php;
+
+       access_log   {{ site_directory }}/backend/web/log/backend-access.log;
+       error_log    {{ site_directory }}/backend/web/log/backend-error.log;
+
+       location / {
+           # Redirect everything that isn't a real file to index.php
+           try_files $uri $uri/ /index.php?$args;
+       
+	if ($request_uri !~ "^/(assets|css)/") {
+       	rewrite  ^/(.*)$ /index.php;
+    	}
+	}
+
+       #uncomment to avoid processing of calls to non-existing static files by Yii
+       location ~ \.(js|css|png|jpg|gif|swf|ico|pdf|mov|fla|zip|rar)$ {
+           try_files $uri =404;
+       }
+       error_page 404 /404.html;
+
+       location ~ \.php$ {
+           include fastcgi_params;
+           fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
+           #fastcgi_pass   127.0.0.1:9000;
+           fastcgi_pass unix:/var/run/php5-fpm.sock;
+           try_files $uri =404;
+       }
+
+       location ~ /\.(ht|svn|git) {
+           deny all;
+       }
+   }

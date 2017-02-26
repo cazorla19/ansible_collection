@@ -1,0 +1,10 @@
+ - name: configure southbridge repo to install PHP
+   yum: name=southbridge-php70-release state=present
+   tags: repo
+
+ - name: install packages [CentOS/RHEL]
+   yum: name={{ item }} state=present disablerepo='*' enablerepo='southbridge*'
+   with_items:
+     - "php"
+     - "php-fpm"
+   tags: install

@@ -1,0 +1,35 @@
+- name: add example users to docker group
+  user:
+    name: "{{ item }}"
+    group: docker
+    append: yes
+  with_items: "{{ docker_users }}"
+  tags: users
+
+- name: login to registry
+  docker_login:
+    registry: reg.example.net
+    username: "{{ reg_user }}"
+    password: "{{ reg_password }}"
+  become_user: ubuntu
+  tags: registry
+
+- name: sync systemd daemon
+  copy:
+    src: docker-{{ computing_environment }}.service
+    dest: /lib/systemd/system/docker.service
+  register: daemon
+  notify: restart docker
+  tags:
+    - daemon
+
+- name: reload systemd daemon
+  command: systemctl daemon-reload
+  when: daemon.changed
+  tags:
+    - daemon
+
+- name: restart docker immediately when daemon changed
+  meta: flush_handlers
+  tags:
+    - daemon

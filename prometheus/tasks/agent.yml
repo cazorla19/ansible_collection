@@ -1,0 +1,62 @@
+- name: create directory for prometheus node exporter
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0777
+  with_items:
+    - "{{ prometheus_root }}"
+    - "{{ prometheus_logs }}"
+  tags: directory
+
+- name: get info about node_exporter presence
+  stat:
+    path: "{{ prometheus_root }}/prometheus"
+  register: exporter_dir
+  tags:
+   - install
+   - rename
+
+- name: get node_exporter
+  unarchive:
+    src: "https://github.com/prometheus/node_exporter/releases/download/v{{ services['prometheus-node-exporter'].version }}/node_exporter-{{ services['prometheus-node-exporter'].version }}.linux-amd64.tar.gz"
+    dest: "{{ prometheus_root }}"
+    remote_src: yes
+  when: exporter_dir.stat.exists ==  False
+  tags: install
+
+- name: rename node-exporter directory
+  command: "mv {{ services['prometheus-node-exporter'].directory }}-{{ services['prometheus-node-exporter'].version }}.linux-amd64 {{ services['prometheus-node-exporter'].directory }}"
+  when: exporter_dir.stat.exists ==  False
+  tags:
+   - install
+   - rename
+
+- name: check exporter installation [1/2]
+  command: "{{ prometheus_root }}/node_exporter/node_exporter --version"
+  register: exporter_version
+  tags: check
+
+- name: check exporter installation [2/2]
+  debug:
+    msg: "{{ exporter_version.stdout }}"
+  tags: check
+
+- name: ensure we have systemd units on the server
+  template:
+    src: "prometheus-node-exporter.j2"
+    dest: "/lib/systemd/system/prometheus-node-exporter.service"
+  notify: restart node-exporter
+  register: daemons
+  tags: service
+
+- name: reload systemd
+  command: systemctl daemon-reload
+  when: daemons.changed
+  tags: service
+
+- name: add services to startup and start them
+  service:
+    name: prometheus-node-exporter
+    enabled: yes
+    state: started
+  tags: service

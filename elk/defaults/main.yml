@@ -1,0 +1,4 @@
+---
+
+elk_major_version: 5
+logstash_configs_path: '../logging/logstash'

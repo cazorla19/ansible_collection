@@ -1,0 +1,14 @@
+- name: fix the hostname
+  hostname:
+    name: "{{ hostname }}"
+  when: hostname is defined
+  tags: hostname
+
+- name: configure virtual memory
+  sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value.current }}"
+    state: present
+    reload: yes
+  with_dict: "{{ memory_settings }}"
+  tags: memory

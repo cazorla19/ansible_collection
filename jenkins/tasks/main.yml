@@ -1,0 +1,8 @@
+---
+
+- name: install nginx
+  include_role:
+    name: nginx
+  tags: nginx
+
+- include: master_setup.yml

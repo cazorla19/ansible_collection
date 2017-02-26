@@ -1,0 +1,8 @@
+- include: efs_mount.yml
+  tags: nfs
+- include: sftp_mount.yml
+  when: kubernetes_master is defined
+  tags: sftp
+- include: sync.yml
+  when: sync is defined
+  tags: sync

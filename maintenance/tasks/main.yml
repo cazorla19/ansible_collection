@@ -1,0 +1,3 @@
+ - include: software_provisioning.yml
+ - include: os_configuration.yml
+ - include: users_configuration.yml

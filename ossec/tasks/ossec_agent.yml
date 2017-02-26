@@ -1,0 +1,31 @@
+ - name: install ossec-agent
+   package: name=ossec-hids-agent state=present force=yes
+   tags: install
+
+ - name: place default ossec-agent config
+   template: src=ossec.j2 dest=/var/ossec/etc/ossec.conf
+   notify: restart ossec
+   when: ossec_vhost is not defined
+   tags: configure
+
+ - name: place special ossec-agent config for vhost
+   template: src={{ templates_dir }}/{{ inventory_hostname }}/ossec.j2 dest=/var/ossec/etc/ossec.conf
+   notify: restart ossec
+   when: ossec_vhost is defined
+   tags: 
+     - vhost
+     - configure
+
+ - name: open agent authentication in ossec-server
+   shell: "/var/ossec/bin/ossec-authd -p 1515 >/dev/null 2>&1 &"
+   delegate_to: example-ossec
+   tags: authentication
+
+ - name: go through remote authentication with ossec-server
+   shell: '/var/ossec/bin/agent-auth -m ossec.example.com -p 1515 -A {{ hostname }}'
+   notify: restart ossec
+   tags: authentication
+
+ - name: start ossec-agent
+   service: name=ossec state=started
+   tags: service

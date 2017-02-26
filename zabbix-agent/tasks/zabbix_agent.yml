@@ -1,0 +1,21 @@
+ - name: install zabbix agent
+   apt: name=zabbix-agent state=present allow_unauthenticated=yes
+   tags: install
+
+ - name: put default config
+   template: src=zabbix_agentd.j2 dest=/etc/zabbix/zabbix_agentd.conf
+   notify: restart zabbix-agent
+   when: zabbix_vhost is not defined
+   tags: configure
+
+ - name: put special config for node
+   template: src={{ templates_dir }}/{{ inventory_hostname }}/zabbix_agentd.j2 dest=/etc/zabbix/zabbix_agentd.conf
+   notify: restart zabbix-agent
+   when: zabbix_vhost is defined
+   tags: 
+     - vhost
+     - configure
+ 
+ - name: restart zabbix-agent
+   service: name=zabbix-agent state=restarted
+   tags: restart

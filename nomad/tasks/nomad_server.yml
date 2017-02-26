@@ -1,0 +1,43 @@
+- name: place nomad config
+  template: src=nomad_server_conf.j2 dest={{ config_dir }}/server.hcl
+  tags: configure
+
+- name: setup nomad server daemon
+  template: src=nomad_server.j2 dest=/etc/systemd/system/nomad-server.service
+  tags: daemon
+  
+- name: reload systemd
+  shell: systemctl daemon-reload
+  tags: daemon
+  
+- name: add nomad to startup
+  service: name=nomad-server enabled=yes
+  tags: startup
+  
+- name: update jobs
+  copy: src={{ nomad_local_configs }}/{{ item }}.json dest={{ config_dir }}/
+  with_items: "{{ nomad_jobs }}"
+  when: nomad_jobs is defined
+  notify: restart nomad-server
+  tags: discovery
+
+- name: start nomad server
+  service: name=nomad-server state=started
+  tags: service
+
+- name: remove nomad from startup
+  service: name=nomad-server enabled=no
+  tags: cleanup
+  
+- name: stop nomad agent
+  service: name=nomad-server state=stopped
+  tags: cleanup
+
+- name: check nomad service state
+  shell: service nomad-server status
+  register: nomad_state
+  tags: check
+  
+- name: print nomad service state
+  debug: msg={{ nomad_state.stdout }}
+  tags: check

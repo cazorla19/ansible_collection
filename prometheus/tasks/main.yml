@@ -1,0 +1,8 @@
+- include: server.yml
+  when: prometheus_server is defined
+
+- include: configure.yml
+  when: prometheus_server is defined
+
+- include: agent.yml
+  when: prometheus_server is not defined

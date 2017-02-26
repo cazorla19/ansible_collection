@@ -1,0 +1,12 @@
+[Unit]
+Description=Prometheus Client (Node Exporter)
+Documentation=https://prometheus.io/docs/introduction/overview/
+After=network-online.target
+
+[Service]
+ExecStart=/bin/sh -c './node_exporter >> {{ services['prometheus-node-exporter'].log }} 2>&1'
+WorkingDirectory={{ services['prometheus-node-exporter'].directory }}
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

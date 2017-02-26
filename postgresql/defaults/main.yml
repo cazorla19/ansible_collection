@@ -1,0 +1,6 @@
+---
+
+remote_postgresql_user: admin
+remote_postgresql_pass: admin
+postgresql_db: wiki
+pg_version: 9.5

@@ -1,0 +1,7 @@
+---
+
+mysql_daemon: mysqld
+mysql_root_pass: rO0t$2016
+site_directory: /var/www/html
+user_home_dir: /root
+mysql_db: test

@@ -1,0 +1,8 @@
+---
+
+vhost: example
+nginx_port: 80
+
+nginx_auth_file: /etc/nginx/.htpasswd
+nginx_auth_user: "{{ lookup('ini', 'user section=nginx_auth file=secure.ini') }}"
+nginx_auth_password: "{{ lookup('ini', 'password section=nginx_auth file=secure.ini') }}"

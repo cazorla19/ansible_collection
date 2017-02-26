@@ -1,0 +1,28 @@
+ - name: install memcached
+   yum: name=memcached state=present
+   tags: install
+
+ - name: install php extensions to php
+   yum: name={{ item }} state=present
+   with_items:
+     - zlib-devel
+     - libmemcached-devel
+     - php-pear
+     - php-pecl-memcached
+   tags: install,php
+
+ - name: replace session handler in php config
+   lineinfile:
+     dest=/etc/php.ini
+     regexp='^session.save_handler'
+     line='session.save_handler = memcached'
+   notify: restart apache
+   tags: configure
+
+ - name: append memcached address to php config
+   lineinfile:
+     dest=/etc/php.ini
+     insertafter='^sess1ion.save_handler'
+     line='session.save_path = "127.0.0.1:11211"'
+   notify: restart apache
+   tags: configure

@@ -1,0 +1,17 @@
+ - name: install postgresql [Debian/Ubuntu]
+   apt: name={{ item }} state=present
+   with_items:
+     - postgresql
+     - libpq-dev
+     - python-psycopg2
+   when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
+   tags: install
+
+ - name: install postgresql [CentOS/RHEL]
+   yum: name="{{ item }}" state=present
+   with_items:
+     - postgresql-server
+     - postgresql-devel
+     - python-psycopg2
+   when: ansible_distribution == "CentOS" or ansible_distribution == "Red Hat Enterprise Linux"
+   tags: install

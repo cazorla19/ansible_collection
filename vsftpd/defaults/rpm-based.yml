@@ -1,0 +1,6 @@
+---
+
+chroot_user1: user1
+chroot_group: ftp-users
+chroot_dir: /opt/files/
+vsftpd_config: /etc/vsftpd/vsftpd.conf

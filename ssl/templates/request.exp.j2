@@ -1,0 +1,25 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+spawn {{ cert_directory }}/csr.sh
+
+expect -gl "*Country Name*"
+send -- "{{ domain_country }}\r"
+expect -gl "*State or Province Name*"
+send -- "{{ site_state }}\r"
+expect -gl "*Locality Name*"
+send -- "{{ site_city }}\r"
+expect -gl "*Organization Name*"
+send -- "{{ organization }}\r"
+expect -gl "*Organizational Unit Name*"
+send -- "{{ organization_section }}\r"
+expect -gl "*Common Name*"
+send -- "{{ domain_full_name }}\r"
+expect -gl "*Email Address*"
+send -- "{{ organization_email }}\r"
+expect -gl "*A challenge password*"
+send -- "\r"
+expect -gl "*An optional company name*"
+send -- "\r"
+
+expect eof

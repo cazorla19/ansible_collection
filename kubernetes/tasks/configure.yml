@@ -1,0 +1,38 @@
+- name: ensure we have directory for kubeconfig
+  file:
+    path: /home/{{ item }}/.kube
+    state: directory
+  with_items: "{{ kube_users }}"
+  tags:
+    - configure
+
+- name: flush cluster configuration to the node
+  template:
+    src: config-{{ computing_environment }}.j2
+    dest: /home/{{ item }}/.kube/config
+  with_items: "{{ kube_users }}"
+  tags:
+    - configure
+    - kubeconfig
+
+- name: append autocomplete for kube_users
+  lineinfile:
+    dest: /home/{{ item }}/.bashrc
+    line: "source <(kubectl completion bash)"
+    insertafter: EOF
+    state: present
+  with_items: "{{ kube_users }}"
+  tags:
+    - configure
+    - autocomplete
+
+- name: append users to docker group
+  user:
+    name: "{{ item }}"
+    group: docker
+    append: yes
+  with_items: "{{ docker_users }}"
+  when: computing_environment == 'dev'
+  tags:
+    - configure
+    - users

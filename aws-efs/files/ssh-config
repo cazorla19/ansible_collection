@@ -1,0 +1,6 @@
+Host sftp.sovcombank.ru
+    Hostname sftp.sovcombank.ru
+    User example
+    Port 2222
+    IdentityFile ~/.ssh/example-sftp
+    StrictHostKeyChecking no
