@@ -6,7 +6,7 @@ Here is my personal Ansible roles collection accumulated for 2 years experience.
 
 ## What's now in collection?
 
-* apache [*approved* - deb/rpm]
+* apache [**approved** - deb/rpm]
 * aws-codedeploy-agent
 * aws-ecs-agent
 * aws-efs
