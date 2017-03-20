@@ -1,0 +1,22 @@
+- name: make website directory
+  file:
+    path: "{{ site_directory }}"
+    state: directory
+  tags:
+    - configure
+    - directory
+
+- name: place apache config
+  template:
+    src:  httpd.j2
+    dest: /etc/httpd/conf.d/httpd.conf
+  notify: reload apache
+  tags: configure
+
+- name: start apache
+  service:
+    name: "{{ apache_daemon }}"
+    state: started
+  tags:
+    - service
+    - install

@@ -2,8 +2,7 @@
 
 apache_daemon: httpd
 apache_port: 8080
-apache_vhost: southbridge
-site_domain_name: test1.southbridge.com
+site_domain_name: localhost
 site_directory: /var/www/html
 remote_user: apache
 remote_group: apache

@@ -1,3 +1,0 @@
-- name: install apache [CentOS/Red Hat]
-  yum: name=httpd state=present
-  tags: install

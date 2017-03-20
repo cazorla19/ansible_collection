@@ -1,7 +1,0 @@
-- name: put test page
-  copy: src=index.html dest={{ site_directory }}/index.html owner={{ remote_user }} group={{ remote_group }} force=yes mode=0755
-  tags: test
-
-- name: place htaccess to rewrite all rules
-  file: src=htaccess dest={{ site_directory }}/.htaccess user={{ remote_user }} group={{ remote_group }} force=yes mode=0644
-  tags: rewrite

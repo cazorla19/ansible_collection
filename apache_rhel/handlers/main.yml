@@ -1,0 +1,2 @@
+ - name: reload apache
+   service: name={{ apache_daemon }} state=reloaded

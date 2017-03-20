@@ -1,0 +1,5 @@
+- name: install apache
+  package:
+    name: "{{ apache_daemon }}"
+    state: present
+  tags: install

@@ -1,0 +1,8 @@
+---
+
+apache_daemon: apache2
+apache_port: 8080
+site_domain_name: localhost
+site_directory: /var/www/html
+remote_user: www-data
+remote_group: www-data
