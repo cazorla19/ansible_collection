@@ -2,7 +2,7 @@
 
 docker_users:
   - ubuntu
-  - mchinkov
 
-reg_user: "{{ lookup('ini', 'user section=docker-registry file=secure.ini') }}"
-reg_password: "{{ lookup('ini', 'password section=docker-registry file=secure.ini') }}"
+reg_host: docker.example.net
+reg_user: reg
+reg_password: reg

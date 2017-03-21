@@ -34,15 +34,17 @@
 
   # TODO! Copy the following 2 tasks to upgrade role
 
-  # Что делает эта команда?
-  # Достает список deb-пакетов, ищет образы ядра
-  # и фильтрует названия пакетов в формате команды 'uname -r'
+  # What does this command do?
+  # It's going through all kernel versions at host
+  # and printing out versions as mentioned at 'uname -r'
+  # Required for AUFS drivers installation on Ubuntu
 
 - name: get all possible kernel versions
   shell: "dpkg -l | grep -E 'linux-image-[0-9]' | awk '{print $2}' | sed 's/linux-image-//g'"
   register: kernel_images
   tags: kernel
 
+  # Let's install AUFS drivers for each kernel version
 - name: install extra drivers
   apt:
     name: "linux-image-extra-{{ item }}"

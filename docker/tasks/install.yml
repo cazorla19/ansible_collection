@@ -1,6 +1,7 @@
+# Freezing installations of new Docker versioning systems
 - name: install docker package
   apt:
-    name: docker-engine
+    name: docker-engine=1.13.1-0~ubuntu-xenial
     state: present
     allow_unauthenticated: yes
   tags: install
@@ -12,6 +13,8 @@
     state: started
   tags: service
 
+# Should be rewritten to built-in apt-mark module
+# After new Ansible release
 - name: freeze auto upgrade for docker
   command: apt-mark hold docker
   tags:

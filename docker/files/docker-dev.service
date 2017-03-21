@@ -9,7 +9,7 @@ Type=notify
 # the default is not to use systemd for cgroups because the delegate issues still
 # exists and systemd currently does not support the cgroup feature set required
 # for containers run by docker
-ExecStart=/usr/bin/dockerd --log-driver=gelf --log-opt gelf-address=udp://elk.example.net:5000 --log-opt tag="dev-k8s/{{.Name}}" -H fd://  --experimental=true --metrics-addr=0.0.0.0:9090
+ExecStart=/usr/bin/dockerd -H fd://  --experimental=true --metrics-addr=0.0.0.0:9090
 ExecReload=/bin/kill -s HUP $MAINPID
 # Having non-zero Limit*s causes performance problems due to accounting overhead
 # in the kernel. We recommend using cgroups to do container-local accounting.
