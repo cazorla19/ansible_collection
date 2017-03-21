@@ -1,8 +1,8 @@
 ---
 
 aws_region: eu-west-1
-
-efs:
-  dev:
-    id: fs-0e3ac2c7
-
+efs_id: fs-11111111
+efs_path: /mnt/efs
+## For Ubuntu/Debian write down 'nfs-common'
+## For CentOS/RHEL write down 'nfs-utils'
+nfs_driver: nfs-common
