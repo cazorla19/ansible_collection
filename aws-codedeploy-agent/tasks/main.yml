@@ -1,46 +1,58 @@
- - name: add repository to get ruby2.0
-   apt_repository: repo='ppa:brightbox/ruby-ng' state=present
-   tags: 
+- name: add repository to get ruby2.0
+  apt_repository:
+    repo: 'ppa:brightbox/ruby-ng'
+    state: present
+  tags:
     - repo
     - ruby
 
- - name: update cache to get ruby packages from new repo
-   apt: update_cache=yes
-   tags:
+- name: update cache to get ruby packages from new repo
+  apt:
+    update_cache: yes
+  tags:
     - repo
     - ruby
     - update
 
- - name: ensure we deal with dependencies
-   apt: name={{ item }} state=present
-   with_items:
+- name: ensure we deal with dependencies
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
     - python-pip
     - wget
     - software-properties-common
     - ruby2.0
-   tags:
+  tags:
     - install
-    - dependencies  
+    - dependencies
 
- - name: get codedeploy-agent installer
-   get_url: url=https://aws-codedeploy-us-west-2.s3.amazonaws.com/latest/install dest=/home/{{ ansible_ssh_user }}/install
-   tags:
+- name: get codedeploy-agent installer
+  get_url:
+    url: https://aws-codedeploy-us-west-2.s3.amazonaws.com/latest/install
+    dest: /home/{{ ansible_ssh_user }}/install
+  tags:
     - download
     - agent
 
- - name: make install script executable
-   file: path=/home/{{ ansible_ssh_user }}/install mode=0755
-   tags:
+- name: make install script executable
+  file:
+    path: /home/{{ ansible_ssh_user }}/install
+    mode: 0755
+  tags:
     - configure
     - agent
 
- - name: install codedeploy-agent
-   shell: '/home/{{ ansible_ssh_user }}/install auto'
-   tags:
+- name: install codedeploy-agent
+  shell: '/home/{{ ansible_ssh_user }}/install auto'
+  tags:
     - install
     - agent
 
- - name: check if codedeploy-agent is running
-   command: systemctl status codedeploy-agent
-   register: service_codedeploy-agent_status
-   tags: service 
+- name: start codedeploy agent
+  service:
+    name: codedeploy-agent
+    state: started
+  tags:
+    - service
+    - agent
