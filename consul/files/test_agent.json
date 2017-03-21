@@ -1,0 +1,11 @@
+{
+    "service": {
+        "check": {
+            "interval": "60s",
+            "script": "curl localhost",
+            "timeout": "3s"
+        },
+        "name": "nginx",
+        "port": 80
+    }
+}

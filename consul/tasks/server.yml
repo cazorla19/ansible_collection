@@ -1,54 +1,76 @@
 - name: setup consul server daemon
-  template: src=consul_server.j2 dest=/etc/systemd/system/consul-server.service
+  template:
+    src: consul_server.j2
+    dest: /etc/systemd/system/consul-server.service
   tags: daemon
-  
+
 - name: reload systemd
   shell: systemctl daemon-reload
   tags: daemon
-  
+
 - name: add Consul to startup
-  service: name=consul-server enabled=yes
+  service:
+    name: consul-server
+    enabled: yes
   tags: startup
-  
+
+- name: setup nginx proxy ahead of dashboard
+  include_role:
+    name: nginx
+  tags: dashboard
+
 - name: make directory for consul web_dashboard
-  file: path={{ dashboard_dir }} state=directory mode=0755
+  file:
+    path: "{{ dashboard_dir }}"
+    state: directory
+    mode: 0755
   tags: dashboard
 
 - name: download web_dashboard
-  get_url: url=https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_web_ui.zip dest=/tmp/consul_{{ consul_version }}_web_ui.zip
+  get_url:
+    url: "https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_web_ui.zip"
+    dest: /tmp/consul_web_ui.zip
   tags: dashboard
-  
+
 - name: append web_dashboard to consul server
-  unarchive: src=/tmp/consul_{{ consul_version }}_web_ui.zip dest={{ dashboard_dir }} copy=no
+  unarchive:
+    src: /tmp/consul_web_ui.zip
+    dest: "{{ dashboard_dir }}"
+    copy: no
   tags: dashboard
-  
+
 - name: update services
-  copy: src={{ consul_local_configs }}/{{ item }}.json dest={{ config_dir }}/
-  with_items: "{{ consul_services }}"
-  when: consul_services is defined
+  copy:
+    src: test_agent.json
+    dest: "{{ config_dir }}/"
   notify: restart consul-server
-  tags: 
+  tags:
    - discovery
    - health_check
 
 - name: update watch
-  copy: src={{ consul_local_configs }}/watch.json dest={{ config_dir }}/
+  copy:
+    src: test_watch.json
+    dest: "{{ config_dir }}/"
   notify: restart consul-server
   tags:
     - discovery
     - watch
 
 - name: start consul server
-  service: name=consul-server state=started
+  service:
+    name: consul-server
+    state: started
   tags: service
 
 - name: check consul service state
   shell: service consul-server status
   register: consul_state
   tags: check
-  
+
 - name: print consul service state
-  debug: msg={{ consul_state.stdout }}
+  debug:
+    msg: "{{ consul_state.stdout }}"
   tags: check
 
 - name: get consul cluster state
@@ -57,5 +79,6 @@
   tags: cluster_check
 
 - name: print cluster info
-  debug: msg={{ cluster_state.stdout.split('\n') }}
+  debug:
+    msg: "{{ cluster_state.stdout.split('\n') }}"
   tags: cluster_check

@@ -1,0 +1,14 @@
+{
+   "watches": [
+        {
+            "type": "checks",
+            "state": "warning",
+            "handler": "/opt/consul_handler.sh"
+        },
+        {
+            "type": "checks",
+            "state": "critical",
+            "handler": "/opt/consul_handler.sh"
+        }
+     ]
+}

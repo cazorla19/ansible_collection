@@ -1,23 +1,33 @@
 - name: stop consul-agent
-  service: name=consul-agent state=stopped
+  service:
+    name: consul-agent
+    state: stopped
   when: inventory_hostname != '{{ consul_server }}'
   tags: cleanup
 
 - name: stop consul-server
-  service: name=consul-server state=stopped
+  service:
+    name: consul-server
+    state: stopped
   when: inventory_hostname == '{{ consul_server }}'
   tags: cleanup
 
 - name: cleanup data directory
-  file: path={{ data_dir }} state=absent
+  file:
+    path: "{{ data_dir }}"
+    state: absent
   tags: cleanup
 
 - name: start consul-server
-  service: name=consul-server state=started
+  service:
+    name: consul-server
+    state: started
   when: inventory_hostname == '{{ consul_server }}'
   tags: cleanup
 
 - name: start consul-agent
-  service: name=consul-agent state=started
+  service:
+    name: consul-agent
+    state: started
   when: inventory_hostname != '{{ consul_server }}'
   tags: cleanup
