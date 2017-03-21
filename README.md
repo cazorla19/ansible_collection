@@ -7,11 +7,11 @@ Here is my personal Ansible roles collection accumulated for 2 years experience.
 ## What's now in collection?
 
 * apache [**approved** - deb/rpm]
-* aws-codedeploy-agent
-* aws-ecs-agent
-* aws-efs
-* consul
-* docker
+* aws-codedeploy-agent[**approved**]
+* aws-ecs-agent[**approved**]
+* aws-efs[**approved**]
+* consul[**approved**]
+* docker[**approved** - deb only]
 * dropbox
 * elasticsearch
 * elk
