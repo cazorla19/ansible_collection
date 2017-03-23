@@ -1,6 +1,5 @@
 #!/bin/sh
 #dropbox service
-DROPBOX_USERS="git ubuntu"
 DAEMON=.dropbox-dist/dropboxd
 
 start() {

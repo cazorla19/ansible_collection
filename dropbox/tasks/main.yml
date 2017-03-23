@@ -1,6 +1,6 @@
- - include: dropbox_preinstall.yml
+ - include: preinstall.yml
 
  - name: wait while user will activate link
    pause: minutes=5 prompt="You have 5 minutes to activate your link. To continue early press 'ctrl+c' and then 'c'."
 
- - include: dropbox_postinstall.yml
+ - include: postinstall.yml

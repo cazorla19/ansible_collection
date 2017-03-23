@@ -1,0 +1,67 @@
+ - name: make directories for Dropbox
+   file:
+     path: "{{ item }}"
+     owner: "{{ ansible_ssh_user }}"
+     state: directory
+     mode: 0755
+   with_items:
+     - "Dropbox"
+     - "bin"
+   tags:
+     - install
+     - directory
+
+ - name: make sysconfig directory for Dropbox
+   file:
+     path: /etc/sysconfig
+     state: directory
+     mode: 0755
+   tags:
+     - install
+     - directory
+
+ - name: put statup scripts
+   copy:
+     src: "{{ item.name }}"
+     dest: "{{ item.path }}/{{ item.name }}"
+     mode: 0755
+   with_items:
+     - { name: 'dropbox', path: '/etc/init.d' }
+     - { name: 'dropbox.service', path: '/etc/systemd/system' }
+     - { name: 'dropbox.sysconfig', path: '/etc/sysconfig' }
+   tags: startup
+
+ - name: reload systemd
+   command: systemctl daemon-reload
+   tags: startup
+
+ - name: add Dropbox service to startup
+   service:
+     name: dropbox
+     enabled: yes
+   tags: startup
+
+ - name: download Dropbox CLI
+   get_url:
+     url: "http://www.dropbox.com/download?dl=packages/dropbox.py"
+     dest: /home/{{ ansible_ssh_user }}/bin/
+     mode: 0755
+   tags: cli
+
+ - name: start dropbox process
+   service:
+     name: dropbox
+     state: started
+   tags:
+     - service
+     - start
+
+ - name: verify we have instance running
+   command: systemctl status dropbox
+   register: service_status
+   tags: service
+
+ - name: print the cli status
+   debug:
+     msg: "{{ service_status.stdout.split('\n') }}"
+   tags: service
