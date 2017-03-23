@@ -12,7 +12,7 @@ Here is my personal Ansible roles collection accumulated for 2 years experience.
 * aws-efs[**approved**]
 * consul[**approved**]
 * docker[**approved** - deb only]
-* dropbox
+* dropbox[**approved** - works, but not everywhere]
 * elasticsearch
 * elk
 * fail2ban
