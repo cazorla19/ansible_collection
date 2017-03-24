@@ -7,21 +7,26 @@ Here is my personal Ansible roles collection accumulated for 2 years experience.
 ## What's now in collection?
 
 * apache [**approved** - deb/rpm]
-* aws-codedeploy-agent[**approved**]
-* aws-ecs-agent[**approved**]
-* aws-efs[**approved**]
-* consul[**approved**]
-* docker[**approved** - deb only]
-* dropbox[**approved** - works, but not everywhere]
-* elasticsearch
-* elk
+* aws-codedeploy-agent [**approved**]
+* aws-ecs-agent [**approved**]
+* aws-efs [**approved**]
+* consul [**approved**]
+* docker [**approved** - deb only]
+* dropbox [**approved** - works, but not everywhere]
+* elasticsearch [**approved** - deb/rpm]
+  a. Java role is not used by default (switch this on setting `java_setup=True`)
+  b. Java role works only for deb version and still not correctly yet
+* elk [**approved** - deb/rpm]
+  a. Java role is not used by default (switch this on setting `java_setup=True`)
+  b. Java role works only for deb version and still not correctly yet
+  c. Nginx role fetched from this collection (ELK virtual host included)
 * fail2ban
 * filebeat
-* golang
 * grafana
 * graylog
 * iptables
-* java
+* java [**not approved** - deb only]
+  a. Oracle license troubles - will be fixed in the future
 * jenkins
 * kibana
 * kubernetes
@@ -31,7 +36,7 @@ Here is my personal Ansible roles collection accumulated for 2 years experience.
 * mediawiki
 * memcached
 * mysql
-* nginx
+* nginx [**approved**]
 * nomad
 * opendkim-postfix
 * ossec
