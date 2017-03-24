@@ -1,0 +1,18 @@
+- name: install logstash
+  package:
+    name: logstash
+    state: present
+    allow_unauthenticated: yes
+  tags: install
+
+- name: enable and start logstash
+  service:
+    name: logstash
+    enabled: yes
+    state: started
+  tags:
+    - configure
+    - service
+
+- name: configure logstash
+  include: logstash-configure.yml

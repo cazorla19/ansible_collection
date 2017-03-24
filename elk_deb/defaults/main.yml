@@ -1,0 +1,10 @@
+---
+
+elk_major_version: 5
+logstash_configs_path: '../logging/logstash'
+
+vhost: elk
+nginx_port: 80
+nginx_auth_file: /etc/nginx/.htpasswd
+nginx_auth_user: elk
+nginx_auth_password: elk

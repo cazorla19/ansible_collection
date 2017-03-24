@@ -1,0 +1,13 @@
+- name: install kibana
+  package:
+    name: kibana
+    state: present
+    allow_unauthenticated: yes
+  tags: install
+
+- name: enable and start kibana
+  service:
+    name: kibana
+    enabled: yes
+    state: started
+  tags: configure

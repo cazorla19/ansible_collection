@@ -1,3 +1,11 @@
+- name: check local logstash configs directory
+  local_action: "stat path={{ logstash_configs_path }}"
+  register: logstash_registry
+  sudo: false
+  tags:
+    - configure
+    - sync
+
 - name: sync logstash configuration directory
   synchronize:
     mode: push
@@ -8,12 +16,13 @@
   with_items:
     - conf.d
     - patterns
+  when: logstash_registry.stat.exists == True
   notify: restart logstash
   tags: sync
 
 - name: test logstash configuration
   command: "/usr/share/logstash/bin/logstash --path.settings /etc/logstash -t"
-  changed_when: False
+  when: logstash_registry.stat.exists == True
   tags:
     - configure
     - sync

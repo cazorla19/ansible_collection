@@ -10,13 +10,6 @@
     allow_unauthenticated: yes
   tags: install
 
-- name: configure kibana
-  lineinfile:
-    dest: /etc/kibana/kibana.yml
-    regexp: '^#server.host:'
-    line: 'server.host: \"localhost\"'
-  tags: configure
-
 - name: enable and start kibana
   service:
     name: kibana

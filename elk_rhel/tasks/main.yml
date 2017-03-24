@@ -1,0 +1,42 @@
+- name: setup nginx [1]
+  set_fact:
+    nginx_auth: True
+  tags: nginx
+
+- name: setup nginx[2]
+  include_role:
+    name: nginx
+  tags: nginx
+
+- name: setup elasticsearch
+  include_role:
+    name: elasticsearch_deb
+  tags: elasticsearch
+
+- name: check ELK repo
+  stat:
+    path: /etc/yum.repos.d/elasticsearch.repo
+  register: repo
+  tags: repo
+
+- name: get gpg key for repo
+  rpm_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+  when: repo.stat.exists == False
+  tags: repo
+
+- name: get ELK repo
+  file:
+    src: elk.repo
+    dest: /etc/yum.repos.d/elk.repo
+  when: repo.stat.exists == False
+  tags: repo
+
+- name: setup logstash
+  include: logstash.yml
+  tags: logstash
+
+- name: setup Kibana
+  include: kibana.yml
+  tags: kibana

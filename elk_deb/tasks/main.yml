@@ -10,7 +10,7 @@
 
 - name: setup elasticsearch
   include_role:
-    name: elasticsearch
+    name: elasticsearch_deb
   tags: elasticsearch
 
 - name: setup logstash
