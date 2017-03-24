@@ -1,2 +1,0 @@
-- name: change default config
-  lineinfile: dest=/etc/elasticsearch/elasticsearch.yml regexp="^# path.logs" insertafter="path.repo: [\"/home/ubuntu/elk_backups\"]"

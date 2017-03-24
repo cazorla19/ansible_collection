@@ -16,7 +16,7 @@
 
 - name: setup Elasticsearch monitoring agent
   command: "/usr/share/elasticsearch/bin/elasticsearch-plugin install -b https://github.com/vvanholl/elasticsearch-prometheus-exporter/releases/download/{{ es_minor_version }}/elasticsearch-prometheus-exporter-{{ es_minor_version }}.zip"
-  when: monitoring_check|failed
+  when: monitoring_check.failed
   notify: restart elasticsearch
   tags:
     - monitoring

@@ -1,0 +1,24 @@
+- name: get gpg key
+  rpm_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+  tags: repo
+
+- name: get elasticsearch repo
+  copy:
+    src: elasticsearch.repo
+    dest: /etc/yum.repos.d/elasticsearch.repo
+  tags: repo
+
+- name: install elasticsearch
+  package:
+    name: elasticsearch
+    state: present
+  tags: install
+
+- name: enable and start elasticsearch
+  service:
+    name: elasticsearch
+    enabled: yes
+    state: started
+  tags: configure
