@@ -14,12 +14,12 @@ Here is my personal Ansible roles collection accumulated for 2 years experience.
 * docker [**approved** - deb only]
 * dropbox [**approved** - works, but not everywhere]
 * elasticsearch [**approved** - deb/rpm]
-  a. Java role is not used by default (switch this on setting `java_setup=True`)
-  b. Java role works only for deb version and still not correctly yet
+  1. Java role is not used by default (switch this on setting `java_setup=True`)
+  2. Java role works only for deb version and still not correctly yet
 * elk [**approved** - deb/rpm]
-  a. Java role is not used by default (switch this on setting `java_setup=True`)
-  b. Java role works only for deb version and still not correctly yet
-  c. Nginx role fetched from this collection (ELK virtual host included)
+  1. Java role is not used by default (switch this on setting `java_setup=True`)
+  2. Java role works only for deb version and still not correctly yet
+  3. Nginx role fetched from this collection (ELK virtual host included)
 * fail2ban
 * filebeat
 * grafana
