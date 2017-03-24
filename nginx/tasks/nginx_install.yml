@@ -1,3 +1,0 @@
-- name: install packages
-  package: name=nginx state=present
-  tags: install
