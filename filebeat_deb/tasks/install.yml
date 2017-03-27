@@ -1,0 +1,19 @@
+- name: get gpg key
+  yum_key:
+    url: "https://artifacts.elastic.co/GPG-KEY-elastic"
+    state: present
+  tags:
+    - repo
+    - key
+
+- name: get elastic repo
+  copy:
+    src: elastic.repo
+    dest: /etc/yum.repos.d/elastic.repo
+  tags: repo
+
+- name: install filebeat
+  package:
+    name: filebeat
+    state: present
+  tags: install
