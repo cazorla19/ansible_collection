@@ -1,2 +1,0 @@
- - name: restart logstash
-   command: /etc/init.d/logstash stop && /etc/init.d/logstash start
