@@ -1,0 +1,22 @@
+- name: place default fail2ban config
+  template:
+    src: "jail.j2"
+    dest: /etc/fail2ban/jail.local
+  notify: restart fail2ban
+  tags: configure
+
+- name: deploy nginx fail2ban filters
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/fail2ban/filter.d/{{ item }}.conf"
+  with_items:
+   - nginx-nohome
+   - nginx-http-auth
+   - nginx-noscript
+   - nginx-badbots
+  notify: restart fail2ban
+  tags: filters
+
+- name: flush restart handler
+  meta: flush_handlers
+  tags: service

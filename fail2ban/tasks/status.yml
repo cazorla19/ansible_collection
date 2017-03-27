@@ -1,0 +1,9 @@
+- name: check fail2ban state
+  shell: 'fail2ban-client status'
+  register: fail2ban_status
+  tags: status
+
+- name: print out fail2ban status
+  debug:
+    msg: "{{ fail2ban_status.stdout_lines }}"
+  tags: status

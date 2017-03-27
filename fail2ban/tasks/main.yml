@@ -1,41 +1,23 @@
- - name: jail.local cleanup
-   file: path=/etc/fail2ban/jail.local state=absent
-   tags: cleanup
+- name: setup mail relay to send notifications
+  include_role:
+    name: mail_relay
 
- - name: install fail2ban
-   package: name=fail2ban state=present
-   tags: install
+- name: install fail2ban
+  package:
+    name: fail2ban
+    state: present
+  tags: install
 
- - name: enable fail2ban
-   service: name=fail2ban enabled=yes
-   tags: service
+- name: setup nginx environment
+  include: nginx-filters.yml
 
- - name: start fail2ban
-   service: name=fail2ban state=started
-   tags: service
+- name: start fail2ban
+  service:
+    name: fail2ban
+    state: started
+    enabled: yes
+  tags: service
 
- - name: place default fail2ban config
-   template: src={{ templates_dir }}/{{ inventory_hostname }}/jail.j2 dest=/etc/fail2ban/jail.local
-   notify: restart fail2ban
-   tags:
-    - configure
-
- - name: deploy nginx fail2ban filters
-   template: src={{ item }}.j2 dest=/etc/fail2ban/filter.d/{{ item }}.conf
-   with_items:
-    - nginx-nohome
-    - nginx-http-auth
-    - nginx-noscript
-    - nginx-badbots
-   notify: restart fail2ban
-   when: nginx_port is defined or inventory_hostname == 'example-payment'
-   tags: filters
-
- - name: check fail2ban state
-   shell: 'fail2ban-client status'
-   register: fail2ban_status
-   tags: status
-
- - name: print out fail2ban status
-   debug: var=fail2ban_status.stdout_lines
-   tags: status
+- name: check fail2ban status
+  include: status.yml
+  tags: status
