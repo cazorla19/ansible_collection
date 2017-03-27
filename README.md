@@ -20,18 +20,21 @@ Here is my personal Ansible roles collection accumulated for 2 years experience.
   1. Java role is not used by default (switch this on setting `java_setup=True`)
   2. Java role works only for deb version and still not correctly yet
   3. Nginx role fetched from this collection (ELK virtual host included)
-* fail2ban
-* filebeat
+* fail2ban [**approved**]
+  1. Oriented to Nginx logs jail by default
+  2. `mail_relay` role included
+* filebeat [**approved** - deb/rpm]
+  1. Oriented to Nginx shipping jail by default
+  2. You can set the ELK server at `filebeat\defaults\main.yml`
 * grafana
 * graylog
 * iptables
 * java [**not approved** - deb only]
-  a. Oracle license troubles - will be fixed in the future
+  1. Oracle license troubles - will be fixed in the future
 * jenkins
-* kibana
 * kubernetes
-* logstash
-* mail_relay
+* mail_relay [**approved**]
+  1. You can set the mail server and test mail destination by variables at `mail_relay\defaults\main.yml`
 * maintenance
 * mediawiki
 * memcached
