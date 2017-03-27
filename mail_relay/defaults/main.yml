@@ -1,8 +1,8 @@
 ---
 
-smtp_relay_hostname: ip-172-31-18-227.us-west-2.compute.internal
-smtp_user: "{{ lookup('ini', 'smtp_user section=mail_relay file=../../../credentials.ini') }}"
-smtp_password: "{{ lookup('ini', 'smtp_password section=mail_relay file=../../../credentials.ini') }}"
+smtp_relay_hostname: example.com
+smtp_user: myuser
+smtp_password: mypass
 smtp_server: smtp.gmail.com
 smtp_port: 587
-target_email: "{{ lookup('ini', 'smtp_target section=mail_relay file=../../../credentials.ini') }}"
+target_email: myuser@gmail.com
