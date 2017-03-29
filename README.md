@@ -26,9 +26,11 @@ Here is my personal Ansible roles collection accumulated for 2 years experience.
 * filebeat [**approved** - deb/rpm]
   1. Oriented to Nginx shipping jail by default
   2. You can set the ELK server at `filebeat\defaults\main.yml`
-* grafana
-* graylog
-* iptables
+* grafana [**approved** - deb/rpm]
+  1. Nginx role fetched from this collection (monitoring virtual host included, also Prometheus locations on vhost)
+* graylog [**approved** - deb only]
+  1. Embedded Elasticsearch and MongoDB installation (by default Elasticsearc version is 2.4.4, cause for now Graylog doesn't work with 5.x)
+  2. Nginx role fetched from this collection (Graylog virtual host included)
 * java [**not approved** - deb only]
   1. Oracle license troubles - will be fixed in the future
 * jenkins
