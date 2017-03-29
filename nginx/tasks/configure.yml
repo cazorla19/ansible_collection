@@ -7,7 +7,7 @@
 
 - name: place suitable vhost
   template:
-    src: "{{ inventory_hostname }}.j2"
+    src: "{{ vhost }}.j2"
     dest: "/etc/nginx/sites-available/{{ vhost }}"
   tags:
     - vhost
