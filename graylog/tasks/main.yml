@@ -1,0 +1,17 @@
+- name: set variables to invoke nginx role
+  set_fact:
+    vhost: graylog
+  tags: nginx
+
+- name: setup nginx
+  include_role:
+    name: nginx
+  tags: nginx
+
+- name: setup dependencies
+  include: dependencies.yml
+  tags: dependencies
+
+- name: setup graylog itself
+  include: install.yml
+  tags: graylog

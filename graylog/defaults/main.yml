@@ -1,0 +1,6 @@
+---
+es_major_version: 2
+graylog_version: 2.2
+elasticsearch_version: 2.4.4
+mongodb_version: "1:2.6.10-0ubuntu1"
+server_name: graylog.example.net

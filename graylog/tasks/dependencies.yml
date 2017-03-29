@@ -1,0 +1,48 @@
+- name: append repo key
+  apt_key:
+    url: https://packages.elastic.co/GPG-KEY-elasticsearch
+    state: present
+  tags: repo
+
+- name: ensure we have elastic repo
+  apt_repository:
+    repo: 'deb http://packages.elastic.co/elasticsearch/{{ es_major_version }}.x/debian stable main'
+    state: present
+  register: elastic_repo
+  tags: repo
+
+- name: update repo
+  apt:
+    update_cache: yes
+  tags: update
+
+- name: setup all necessary software
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "apt-transport-https"
+    - "openjdk-8-jre-headless"
+    - "uuid-runtime"
+    - "pwgen"
+    - "mongodb-server={{ mongodb_version }}"
+    - "elasticsearch={{ elasticsearch_version }}"
+    - "pwgen"
+  tags: install
+
+- name: rename cluster
+  lineinfile:
+    dest: /etc/elasticsearch/elasticsearch.yml
+    line: "cluster.name: graylog"
+    insertafter: EOF
+  tags: configure
+
+- name: start and enable mongodb & elasticsearch
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - mongodb
+    - elasticsearch
+  tags: service

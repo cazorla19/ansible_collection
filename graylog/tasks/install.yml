@@ -1,0 +1,49 @@
+- name: setup graylog repo
+  apt:
+    deb: "https://packages.graylog2.org/repo/packages/graylog-{{ graylog_version }}-repository_latest.deb"
+    state: present
+  tags: repo
+
+- name: update repo cache
+  apt:
+    update_cache: yes
+  tags: repo
+
+- name: install graylog
+  apt:
+    name: graylog-server
+    state: present
+  tags: install
+
+- name: generate random password
+  shell: "pwgen -N 1 -s 96"
+  register: pwgen
+  tags: password
+
+- name: set graylog password
+  set_fact:
+    graylog_password: "{{ pwgen.stdout }}"
+  tags: password
+
+- name: generate sha2 password
+  shell: "echo -n {{ graylog_password }} | sha256sum | awk '{print $1}'"
+  register: sha
+  tags: hash
+
+- name: setup hash variable
+  set_fact:
+    hash: "{{ sha.stdout }}"
+  tags: hash
+
+- name: flush graylog config
+  template:
+    src: server.j2
+    dest: /etc/graylog/server/server.conf
+  tags: configure
+
+- name: enable and start graylog
+  service:
+    name: graylog-server
+    enabled: yes
+    state: started
+  tags: service

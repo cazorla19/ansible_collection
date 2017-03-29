@@ -6,7 +6,7 @@
 # Characters that cannot be directly represented in this encoding can be written using Unicode escapes
 # as defined in https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.3, using the \u prefix.
 # For example, \u002c.
-# 
+#
 # * Entries are generally expected to be a single line of the form, one of the following:
 #
 # propertyName=propertyValue
@@ -14,7 +14,7 @@
 #
 # * White space that appears between the property name and property value is ignored,
 #   so the following are equivalent:
-# 
+#
 # name=Stephen
 # name = Stephen
 #
@@ -34,11 +34,11 @@
 #         Los Angeles
 #
 #   This is equivalent to targetCities=Detroit,Chicago,Los Angeles (white space at the beginning of lines is ignored).
-# 
+#
 # * The characters newline, carriage return, and tab can be inserted with characters \n, \r, and \t, respectively.
-# 
+#
 # * The backslash character must be escaped as a double backslash. For example:
-# 
+#
 # path=c:\\docs\\doc1
 #
 
@@ -52,7 +52,7 @@ node_id_file = /etc/graylog/server/node-id
 
 # You MUST set a secret to secure/pepper the stored user passwords here. Use at least 64 characters.
 # Generate one by using for example: pwgen -N 1 -s 96
-password_secret = 09zWO3JAdeJBlaa6Zq0zCNTP2f0saIMcfuMOjhCeWpOA8wnwtdNfzaUJFFXGUOTYKJnRE6LOXW0SIHEEG3cQfHN1W0mrbo6X
+password_secret = {{ graylog_password }}
 
 # The default root user is named 'admin'
 #root_username = admin
@@ -63,7 +63,7 @@ password_secret = 09zWO3JAdeJBlaa6Zq0zCNTP2f0saIMcfuMOjhCeWpOA8wnwtdNfzaUJFFXGUO
 # modify it in this file.
 # Create one by using for example: echo -n yourpassword | shasum -a 256
 # and put the resulting hash value into the following line
-root_password_sha2 = a09805fc461a8252ba0de4d7e5b7d0572ae9ebbb31d71afe8945c0c17e2a77e9
+root_password_sha2 = {{ hash }}
 
 # The email address of the root user.
 # Default is empty
@@ -87,7 +87,7 @@ rest_listen_uri = http://0.0.0.0:12900/api/
 # You will need to define this, if your Graylog server is running behind a HTTP proxy that is rewriting
 # the scheme, host name or URI.
 # This must not contain a wildcard address (0.0.0.0).
-rest_transport_uri = http://elk.example.net:12900/api/
+rest_transport_uri = http://{{ server_name }}:12900/api/
 
 # Enable CORS headers for REST API. This is necessary for JS-clients accessing the server directly.
 # If these are disabled, modern browsers will not be able to retrieve resources from the server.
@@ -137,7 +137,7 @@ web_listen_uri = http://127.0.0.1:9000/
 
 # Web interface endpoint URI. This setting can be overriden on a per-request basis with the X-Graylog-Server-URL header.
 # Default: $rest_transport_uri
-web_endpoint_uri = http://elk.example.net:12900/api/
+web_endpoint_uri = http://{{ server_name }}:12900/api/
 # Enable CORS headers for the web interface. This is necessary for JS-clients accessing the server directly.
 # If these are disabled, modern browsers will not be able to retrieve resources from the server.
 #web_enable_cors = false
@@ -172,7 +172,7 @@ web_endpoint_uri = http://elk.example.net:12900/api/
 # Configuration file for the embedded Elasticsearch instance in Graylog.
 # Pay attention to the working directory of the server, maybe use an absolute path here.
 # Default: empty
-#elasticsearch_config_file = /etc/graylog/server/elasticsearch.yml
+elasticsearch_config_file = /etc/elasticsearch/elasticsearch.yml
 
 # Graylog will use multiple indices to store documents in. You can configured the strategy it uses to determine
 # when to rotate the currently active write index.
@@ -183,7 +183,7 @@ web_endpoint_uri = http://elk.example.net:12900/api/
 #
 # ATTENTION: These settings have been moved to the database in 2.0. When you upgrade, make sure to set these
 #            to your previous 1.x settings so they will be migrated to the database!
-rotation_strategy = time
+#rotation_strategy = size
 
 # (Approximate) maximum number of documents in an Elasticsearch index before a new index
 # is being created, also see no_retention and elasticsearch_max_number_of_indices.
@@ -191,7 +191,7 @@ rotation_strategy = time
 #
 # ATTENTION: These settings have been moved to the database in 2.0. When you upgrade, make sure to set these
 #            to your previous 1.x settings so they will be migrated to the database!
-elasticsearch_max_docs_per_index = 20000000
+#elasticsearch_max_docs_per_index = 1000000
 
 # (Approximate) maximum size in bytes per Elasticsearch index on disk before a new index is being created, also see
 # no_retention and elasticsearch_max_number_of_indices. Default is 1GB.
@@ -199,7 +199,7 @@ elasticsearch_max_docs_per_index = 20000000
 #
 # ATTENTION: These settings have been moved to the database in 2.0. When you upgrade, make sure to set these
 #            to your previous 1.x settings so they will be migrated to the database!
-#elasticsearch_max_size_per_index = 1073741824
+# elasticsearch_max_size_per_index = 536870912
 
 # (Approximate) maximum time before a new Elasticsearch index is being created, also see
 # no_retention and elasticsearch_max_number_of_indices. Default is 1 day.
@@ -214,11 +214,11 @@ elasticsearch_max_docs_per_index = 20000000
 #
 # ATTENTION: These settings have been moved to the database in 2.0. When you upgrade, make sure to set these
 #            to your previous 1.x settings so they will be migrated to the database!
-elasticsearch_max_time_per_index = 12h
+# elasticsearch_max_time_per_index = 12h
 
 # Disable checking the version of Elasticsearch for being compatible with this Graylog release.
 # WARNING: Using Graylog with unsupported and untested versions of Elasticsearch may lead to data loss!
-#elasticsearch_disable_version_check = true
+elasticsearch_disable_version_check = false
 
 # Disable message retention on this node, i. e. disable Elasticsearch index rotation.
 #no_retention = false
@@ -227,7 +227,7 @@ elasticsearch_max_time_per_index = 12h
 #
 # ATTENTION: These settings have been moved to the database in 2.0. When you upgrade, make sure to set these
 #            to your previous 1.x settings so they will be migrated to the database!
-elasticsearch_max_number_of_indices = 28
+#elasticsearch_max_number_of_indices = 30
 
 # Decide what happens with the oldest indices when the maximum number of indices is reached.
 # The following strategies are availble:
@@ -236,7 +236,7 @@ elasticsearch_max_number_of_indices = 28
 #
 # ATTENTION: These settings have been moved to the database in 2.0. When you upgrade, make sure to set these
 #            to your previous 1.x settings so they will be migrated to the database!
-retention_strategy = delete
+#retention_strategy = delete
 
 # How many Elasticsearch shards and replicas should be used per index? Note that this only applies to newly created indices.
 # ATTENTION: These settings have been moved to the database in Graylog 2.2.0. When you upgrade, make sure to set these
@@ -268,7 +268,7 @@ allow_highlighting = false
 # settings to be passed to elasticsearch's client (overriding those in the provided elasticsearch_config_file)
 # all these
 # this must be the same as for your Elasticsearch cluster
-#elasticsearch_cluster_name = graylog
+elasticsearch_cluster_name = elasticsearch
 
 # The prefix being used to generate the Elasticsearch node name which makes it easier to identify the specific Graylog
 # server running the embedded Elasticsearch instance. The node name will be constructed by concatenating this prefix
@@ -279,7 +279,7 @@ allow_highlighting = false
 # A comma-separated list of Elasticsearch nodes which Graylog is using to connect to the Elasticsearch cluster,
 # see https://www.elastic.co/guide/en/elasticsearch/reference/2.3/modules-discovery-zen.html for details.
 # Default: 127.0.0.1
-#elasticsearch_discovery_zen_ping_unicast_hosts = 127.0.0.1:9300
+elasticsearch_discovery_zen_ping_unicast_hosts = 127.0.0.1:9300
 
 # Use multiple Elasticsearch nodes as seed
 #elasticsearch_discovery_zen_ping_unicast_hosts = 198.51.100.23:9300, 198.51.100.42:9300
