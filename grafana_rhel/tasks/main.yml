@@ -1,0 +1,29 @@
+- name: set nginx vhost
+  set_fact:
+    vhost: monitoring
+    nginx_auth: True
+  tags: nginx
+
+- name: ensure nginx is installed
+  include_role:
+    name: nginx
+  tags: nginx
+
+- name: add Grafana repository
+  copy:
+    src: grafana.repo
+    dest: /etc/yum.repos.d/grafana.repo
+  tags: repo
+
+- name: install Grafana
+  yum:
+    name: grafana
+    state: present
+  tags: install
+
+- name: start Grafana
+  service:
+    name: grafana-server
+    enabled: yes
+    state: started
+  tags: service

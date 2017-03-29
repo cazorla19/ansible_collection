@@ -1,3 +1,9 @@
+- name: set nginx vhost
+  set_fact:
+    vhost: monitoring
+    nginx_auth: True
+  tags: nginx
+
 - name: ensure nginx is installed
   include_role:
     name: nginx
@@ -11,7 +17,7 @@
 
 - name: add Grafana repository
   apt_repository:
-    repo: deb https://packagecloud.io/grafana/stable/debian/ jessie main
+    repo: "deb https://packagecloud.io/grafana/stable/debian/ jessie main"
     state: present
   tags: repo
 
