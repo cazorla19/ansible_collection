@@ -1,8 +1,7 @@
 ---
 configuration:
-  dev:
-    kube_master: 172.17.101.83
-    auth_token: "{{ lookup('ini', 'dev_token section=kubernetes file=secure.ini') }}"
+  kube_master: kube-master.example.com
+  auth_token: "349843mytokenishere293290"
 
 packages:
   - kubelet
@@ -11,18 +10,5 @@ packages:
   - kubernetes-cni
 
 kube_users:
-  - semaginea
-  - atishin
-  - vmarunov
-  - igafarov
-  - apuzhlyakov
-  - mpovolnova
-  - gkondratenko
-  - mchinkov
-  - smonichev
-  - ubuntu
-
-docker_users:
-  - ubuntu
-  - igafarov
-  - atishin
+  - root
+  - "{{ ansible_ssh_user }}"

@@ -2,13 +2,15 @@
   file:
     path: /home/{{ item }}/.kube
     state: directory
+  become: yes
+  become_user: "{{ item }}"
   with_items: "{{ kube_users }}"
   tags:
     - configure
 
 - name: flush cluster configuration to the node
   template:
-    src: config-{{ computing_environment }}.j2
+    src: config.j2
     dest: /home/{{ item }}/.kube/config
   with_items: "{{ kube_users }}"
   tags:
@@ -31,8 +33,7 @@
     name: "{{ item }}"
     group: docker
     append: yes
-  with_items: "{{ docker_users }}"
-  when: computing_environment == 'dev'
+  with_items: "{{ kube_users }}"
   tags:
     - configure
     - users

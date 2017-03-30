@@ -7,7 +7,7 @@
     - join
 
 - name: join kubernetes cluster
-  command: "kubeadm join {{configuration.get(computing_environment).kube_master}} --token {{configuration.get(computing_environment).auth_token}} --skip-preflight-checks"
+  command: "kubeadm join {{configuration.kube_master}} --token {{configuration.auth_token}} --skip-preflight-checks"
   when: kubeadmin_config.stat.exists == False
   tags:
     - cluster

@@ -2,4 +2,3 @@
 - include: configure.yml
 - include: join.yml
   when: kubernetes_master is not defined
-- include: triggers.yml

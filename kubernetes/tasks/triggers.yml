@@ -1,8 +1,0 @@
-- name: restart kubelet
-  service:
-    name: kubelet
-    state: restarted
-  when: kube_restart is defined
-  tags:
-    - restart
-    - service
