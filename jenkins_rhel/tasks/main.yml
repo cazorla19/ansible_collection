@@ -1,0 +1,15 @@
+---
+
+- name: set facts to install nginx
+  set_fact:
+    vhost: jenkins
+    server_name: jenkins.example.com
+    proxy_port: 8080
+  tags: nginx
+
+- name: install nginx
+  include_role:
+    name: nginx
+  tags: nginx
+
+- include: master_setup.yml

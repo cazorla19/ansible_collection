@@ -1,0 +1,27 @@
+- name: add key for repo
+  rpm_key:
+    url: "http://pkg.jenkins-ci.org/redhat-stable/jenkins-ci.org.key"
+    state: present
+  tags: repo
+
+- name: add jenkins repository
+  copy:
+    src: jenkins.repo
+    dest: /etc/yum.repos.d/jenkins.repo
+  tags: repo
+
+- name: install jenkins with java
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - jenkins
+    - java
+  tags: install
+
+- name: start jenkins
+  service:
+    name: jenkins
+    enabled: yes
+    state: started
+  tags: service
