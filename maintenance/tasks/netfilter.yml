@@ -1,60 +1,50 @@
- - name: reconfigure netfilter variables
-   sysctl: name=net.netfilter.{{ item.variable }} value={{ item.value }} state=present
-   with_items:
-    - { variable: 'nf_conntrack_max', value: 10000000 }
-    - { variable: 'nf_conntrack_tcp_loose', value: 0 }
-    - { variable: 'nf_conntrack_tcp_timeout_established', value: 1800 }
-    - { variable: 'nf_conntrack_tcp_timeout_close', value: 10 }
-    - { variable: 'nf_conntrack_tcp_timeout_close_wait', value: 10 }
-    - { variable: 'nf_conntrack_tcp_timeout_fin_wait', value: 20 }
-    - { variable: 'nf_conntrack_tcp_timeout_last_ack', value: 20 }
-    - { variable: 'nf_conntrack_tcp_timeout_syn_recv', value: 20 }
-    - { variable: 'nf_conntrack_tcp_timeout_syn_sent', value: 20 }
-    - { variable: 'nf_conntrack_tcp_timeout_time_wait', value: 10 }
-   tags:
-    - nf_conntrack
-    - netfilter
-    - system_vars
+- name: reconfigure netfilter variables
+  sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value.current }}"
+    state: present
+    reload: yes
+  with_dict: "{{ netfilter_settings }}"
+  tags:
+   - nf_conntrack
+   - netfilter
+   - system_vars
 
- - name: reload sysctl
-   shell: 'sysctl -p'
-   tags:
-    - netfilter 
-    - system_vars
+- name: install iptables
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+   - iptables
+   - iptables-persistent
+  tags:
+   - netfilter
+   - iptables
+   - install
 
- - name: install iptables
-   apt: name={{ item }} state=present
-   with_items:
-    - iptables
-    - iptables-persistent
-   tags:
-    - netfilter
-    - iptables
-    - install
+- name: add iptables rules to drop malware tcp connections
+  shell: '{{ item }}'
+  with_items:
+   - 'iptables -t mangle -A PREROUTING -m conntrack --ctstate INVALID -j DROP'
+   - 'iptables -t mangle -A PREROUTING -p tcp ! --syn -m conntrack --ctstate NEW -j DROP'
+   - 'iptables -t mangle -A PREROUTING -p tcp -m conntrack --ctstate NEW -m tcpmss ! --mss 536:65535 -j DROP'
+  tags:
+   - netfilter
+   - iptables
+   - configure
 
- - name: add iptables rules to drop malware tcp connections
-   shell: '{{ item }}'
-   with_items:
-    - 'iptables -t mangle -A PREROUTING -m conntrack --ctstate INVALID -j DROP'
-    - 'iptables -t mangle -A PREROUTING -p tcp ! --syn -m conntrack --ctstate NEW -j DROP'
-    - 'iptables -t mangle -A PREROUTING -p tcp -m conntrack --ctstate NEW -m tcpmss ! --mss 536:65535 -j DROP'
-   tags:
-    - netfilter
-    - iptables
-    - configure
+- name: save iptables rules[trusty]
+  shell: service iptables-persistent save
+  when: ansible_distribution ==  "Ubuntu" and ansible_distribution_release ==  '14.04'
+  tags:
+   - netfilter
+   - iptables
+   - configure
 
- - name: save iptables rules[trusty]
-   shell: service iptables-persistent save
-   when: ansible_distribution == "Ubuntu" and ansible_distribution_release == '14.04'
-   tags:
-    - netfilter
-    - iptables
-    - configure
-
- - name: save iptables rules[xenial]
-   shell: service netfilter-persistent save
-   when: ansible_distribution == "Ubuntu" and ansible_distribution_release != '14.04'
-   tags:
-    - netfilter
-    - iptables
-    - configure
+- name: save iptables rules[xenial]
+  shell: service netfilter-persistent save
+  when: ansible_distribution ==  "Ubuntu" and ansible_distribution_release !=  '14.04'
+  tags:
+   - netfilter
+   - iptables
+   - configure

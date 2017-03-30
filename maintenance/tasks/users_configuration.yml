@@ -2,9 +2,7 @@
   group:
     name: "{{ item }}"
     state: present
-  with_items:
-    - developers
-    - operations
+  with_items: "{{ user_groups }}"
   tags: groupadd
 
 - name: append users

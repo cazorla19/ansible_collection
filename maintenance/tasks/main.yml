@@ -1,3 +1,25 @@
- - include: software_provisioning.yml
- - include: os_configuration.yml
- - include: users_configuration.yml
+- name: enable kernel modules
+  modprobe:
+    name: "{{ item }}"
+  with_items:
+     - nf_conntrack
+     - nf_conntrack_ipv4
+  tags: modules
+
+- name: check process memory and port usage
+  include: check.yml
+  tags: check
+
+  # NOTE! Works for Ubuntu only!
+- name: configure basic netfilter
+  include: netfilter.yml
+  when: ansible_distribution == 'Ubuntu'
+  tags: netfilter
+
+- name: install custom software for better node maintenance
+  include: software_provisioning.yml
+  tags: software
+
+  # NOTE! Ensure you've configured users in your variables as mentioned in tasks file
+  include: users_configuration.yml
+  tags: users

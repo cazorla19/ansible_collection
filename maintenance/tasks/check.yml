@@ -1,39 +1,27 @@
- - name: check process list on servers
-   shell: 'pstree'
-   register: ps_list
-   tags:
-    - pstree 
-    - check
-
- - name: print process list
-   debug: msg={{ ps_list.stdout.split('\n') }} 
-   tags:
-    - pstree
-    - check
-
- - name: check which process eats more memory
-   shell: "ps aux | sort -nk +4 | tail | awk '{print $4 \"\t\" $11}'"
-   register: table_memory
-   tags:
+- name: check which process eats more memory
+  shell: "ps aux | sort -nk +4 | tail | awk '{print $4 \"\t\" $11}'"
+  register: table_memory
+  tags:
     - memory
     - check
 
- - name: print memory table
-   debug: msg={{ table_memory.stdout.split('\n') }}
-   tags:
+- name: print memory table
+  debug:
+    msg: "{{ table_memory.stdout.split('\n').replace('\\t', '    ') }}"
+  tags:
     - memory
     - check
 
- - name: get netstat information about listening ports
-   shell: "netstat -tupln | grep -E 'tcp|udp'"
-   register: netstat_info
-   tags:
-    - network 
+- name: get netstat information about listening ports
+  shell: "netstat -tupln | grep -E 'tcp|udp'"
+  register: netstat_info
+  tags:
+    - network
     - check
 
- - name: print netstat_info
-   debug: msg={{ netstat_info.stdout.split('\n') }}
-   tags:
-    - network 
+- name: print netstat_info
+  debug:
+    msg: "{{ netstat_info.stdout.split('\n') }}"
+  tags:
+    - network
     - check
-

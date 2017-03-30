@@ -12,3 +12,21 @@
     reload: yes
   with_dict: "{{ memory_settings }}"
   tags: memory
+
+- name: configure network
+  sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value.current }}"
+    state: present
+    reload: yes
+  with_dict: "{{ network_settings }}"
+  tags: network
+
+- name: configure cpu
+  sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value.current }}"
+    state: present
+    reload: yes
+  with_dict: "{{ cpu_settings }}"
+  tags: cpu

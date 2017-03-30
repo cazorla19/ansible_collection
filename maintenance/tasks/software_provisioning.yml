@@ -1,11 +1,5 @@
-- name: update the cache
-  apt:
-    update_cache: yes
-    cache_valid_time: 3600
-  tags: software
-
 - name: install software for maintenance and operations
-  apt:
+  package:
     name: "{{ item }}"
     state: present
   with_items:
@@ -16,11 +10,3 @@
     - curl
     - python
   tags: software
-
-- name: make a system upgrade
-  apt:
-    upgrade: dist
-  when: upgrade is defined
-  tags:
-   - software
-   - upgrade
