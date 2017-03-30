@@ -1,5 +1,0 @@
- - name: set rights
-   file: path={{ cert_directory }}/{{ domain_name }}.conf owner={{ remote_user }} group={{ remote_group }} mode=0400
-
- - name: restart apache
-   service: name={{ apache_daemon }} state=restarted
