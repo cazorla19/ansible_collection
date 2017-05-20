@@ -6,61 +6,61 @@ Here is my personal Ansible roles collection accumulated for 2 years experience.
 
 ## What's now in collection?
 
-* apache [**approved** - deb/rpm]
-* aws-codedeploy-agent [**approved**]
-* aws-ecs-agent [**approved**]
-* aws-efs [**approved**]
-* consul [**approved**]
-* docker [**approved** - deb only]
-* dropbox [**approved** - works, but not everywhere]
-* elasticsearch [**approved** - deb/rpm]
+- [x] apache
+- [x] aws-codedeploy-agent
+- [x] aws-ecs-agent
+- [x] aws-efs
+- [x] consul
+- [x] docker
+- [x] dropbox
+- [x] elasticsearch
   1. Java role is not used by default (switch this on setting `java_setup=True`)
   2. Java role works only for deb version and still not correctly yet
-* elk [**approved** - deb/rpm]
+- [x] elk
   1. Java role is not used by default (switch this on setting `java_setup=True`)
   2. Java role works only for deb version and still not correctly yet
   3. Nginx role fetched from this collection (ELK virtual host included)
-* fail2ban [**approved**]
+- [x] fail2ban
   1. Oriented to Nginx logs jail by default
   2. `mail_relay` role included
-* filebeat [**approved** - deb/rpm]
+- [x] filebeat
   1. Oriented to Nginx shipping jail by default
   2. You can set the ELK server at `filebeat\defaults\main.yml`
-* grafana [**approved** - deb/rpm]
+- [x] grafana
   1. Nginx role fetched from this collection (monitoring virtual host included, also Prometheus locations on vhost)
-* graylog [**approved** - deb only]
+- [x] graylog
   1. Embedded Elasticsearch and MongoDB installation (by default Elasticsearc version is 2.4.4, cause for now Graylog doesn't work with 5.x)
   2. Nginx role fetched from this collection (Graylog virtual host included)
-* java-oracle [**not approved** - deb only]
+- [x] java-oracle
   1. Oracle license troubles - will be fixed in the future
-* jenkins [**approved** - deb/rhel]
+- [x] jenkins
   1. Java role for Deb installation doesn't work correctly yet (switched off by default)
   2. Nginx role fetched from this collection (Jenkins virtual host included)
-* kubernetes [**approved** - deb only]
+- [x] kubernetes
   1. Includes only cluster node setup; master may be configured, but cluster initialization is not automated yet
   2. Shipped with Weave.net CLI
-* mail_relay [**approved**]
+- [x] mail_relay
   1. You can set the mail server and test mail destination by variables at `mail_relay\defaults\main.yml`
-* maintenance [**approved**]
+- [x] maintenance
   1. Role includes system settings setup, hostname setup, users configuration (customized by variables), CLI tools provisioning and netfilter setup with IPtables rules
   2. Netfilter tasks set is only available on Ubuntu
-* mediawiki
-* memcached
-* mysql
-* nginx [**approved**]
-* nomad
-* opendkim-postfix
-* ossec
-* percona
-* php
-* postgresql
-* prometheus
-* redis
-* tarantool
-* vsftpd
-* wordpress
-* yii
-* zabbix-agent
+- [ ] mediawiki
+- [ ] memcached
+- [ ] mysql
+- [x] nginx
+- [ ] nomad
+- [ ] opendkim-postfix
+- [ ] ossec
+- [ ] percona
+- [ ] php
+- [ ] postgresql
+- [ ] prometheus
+- [ ] redis
+- [ ] tarantool
+- [ ] vsftpd
+- [ ] wordpress
+- [ ] yii
+- [ ] zabbix-agent
 
 ## Can I apply these roles to my own infrastructure right now?
 
